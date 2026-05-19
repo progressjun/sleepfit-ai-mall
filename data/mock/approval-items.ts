@@ -1,0 +1,40 @@
+import type { ApprovalItem } from "@/types";
+
+export const mockApprovalItems: ApprovalItem[] = [
+  {
+    id: "approval_001",
+    projectId: "project_001",
+    type: "detail_page",
+    title: "프리미엄 유산균 세트 상세페이지 초안",
+    summary: "건강 관련 단정 표현을 줄인 전환형 상세페이지 구조입니다.",
+    status: "pending_review",
+    riskLevel: "medium",
+    payload: { productId: "product_001" },
+    createdAt: "2026-05-05T05:20:00.000Z",
+    updatedAt: "2026-05-05T05:20:00.000Z",
+  },
+  {
+    id: "approval_002",
+    projectId: "project_001",
+    type: "migration",
+    title: "서버 이전 체크리스트",
+    summary: "상품, URL, 스크립트 이전 범위를 포함한 체크리스트입니다.",
+    status: "approved",
+    riskLevel: "low",
+    payload: { diagnosticId: "migration_001" },
+    createdAt: "2026-05-04T04:00:00.000Z",
+    updatedAt: "2026-05-04T06:00:00.000Z",
+  },
+  {
+    id: "approval_003",
+    projectId: "project_001",
+    type: "ai_cs",
+    title: "AI CS 템플릿",
+    summary: "환불 기준과 상담원 연결 조건 검토가 필요한 응대 템플릿입니다.",
+    status: "pending_review",
+    riskLevel: "high",
+    payload: { policyId: "cs_001" },
+    createdAt: "2026-05-05T09:00:00.000Z",
+    updatedAt: "2026-05-05T09:00:00.000Z",
+  },
+];

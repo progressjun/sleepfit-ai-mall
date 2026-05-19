@@ -1,0 +1,48 @@
+import type { AuditLog } from "@/types";
+
+export const mockAuditLogs: AuditLog[] = [
+  {
+    id: "log_001",
+    projectId: "project_001",
+    createdAt: "2026-05-01T09:00:00.000Z",
+    actor: "Demo Admin",
+    action: "project_created",
+    target: "프리미엄 헬스케어 브랜드 이전 프로젝트",
+    nextStatus: "in_progress",
+    riskLevel: "low",
+    apiStatus: "mock",
+  },
+  {
+    id: "log_002",
+    projectId: "project_001",
+    createdAt: "2026-05-04T04:00:00.000Z",
+    actor: "AI Assistant",
+    action: "ai_generated",
+    target: "서버 이전 진단 생성",
+    nextStatus: "pending_review",
+    riskLevel: "medium",
+    apiStatus: "mock",
+  },
+  {
+    id: "log_003",
+    projectId: "project_001",
+    createdAt: "2026-05-05T05:20:00.000Z",
+    actor: "AI Assistant",
+    action: "ai_generated",
+    target: "상세페이지 초안 생성",
+    nextStatus: "pending_review",
+    riskLevel: "medium",
+    apiStatus: "mock",
+  },
+  {
+    id: "log_004",
+    projectId: "project_001",
+    createdAt: "2026-05-05T09:00:00.000Z",
+    actor: "AI Assistant",
+    action: "ai_generated",
+    target: "AI CS 템플릿 생성",
+    nextStatus: "pending_review",
+    riskLevel: "high",
+    apiStatus: "mock",
+  },
+];

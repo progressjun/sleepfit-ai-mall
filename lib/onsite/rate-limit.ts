@@ -11,7 +11,7 @@ interface RateLimitResult {
   windowMs: number;
 }
 
-type OnsiteRoute = "events" | "recommendation" | "chat";
+type OnsiteRoute = "events" | "recommendation" | "chat" | "discovery" | "crawl";
 
 interface CheckOptions {
   route: OnsiteRoute;
@@ -27,6 +27,8 @@ const envLimitDefaults: Record<OnsiteRoute, number> = {
   events: 600,
   recommendation: 80,
   chat: 120,
+  discovery: 240,
+  crawl: 20,
 };
 
 function clampRateLimit(value: number, fallback: number) {
@@ -42,6 +44,14 @@ function getRateLimitConfig() {
     envLimitDefaults.recommendation,
   );
   const chat = clampRateLimit(Number(process.env.ONSITE_RATE_LIMIT_CHAT || envLimitDefaults.chat.toString()), envLimitDefaults.chat);
+  const discovery = clampRateLimit(
+    Number(process.env.ONSITE_RATE_LIMIT_DISCOVERY || envLimitDefaults.discovery.toString()),
+    envLimitDefaults.discovery,
+  );
+  const crawl = clampRateLimit(
+    Number(process.env.ONSITE_RATE_LIMIT_CRAWL || envLimitDefaults.crawl.toString()),
+    envLimitDefaults.crawl,
+  );
 
   return {
     windowMs,
@@ -49,6 +59,8 @@ function getRateLimitConfig() {
       events,
       recommendation,
       chat,
+      discovery,
+      crawl,
     } satisfies Record<OnsiteRoute, number>,
   };
 }

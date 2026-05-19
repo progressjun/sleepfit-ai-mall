@@ -1,21 +1,24 @@
-# 현재 상태 (2026-05-19 기준)
+# Current Status (2026-05-19)
 
-## 운영 상태
-- 저장소는 `/widget/v1.js` 기반 삽입형 원클릭 위젯 구조로 정착됨
-- 서버측 API 라우트는 `/api/onsite/*`(이벤트/추천/채팅)로 분리됨
-- 온사이트 스크립트는 Shadow DOM 기반으로 UI 충돌을 완화
-- 브랜드 범위 정책(비브랜딩 응답 차단)이 활성화된 상태
+## Current Snapshot
+- `widget/v1.js` endpoint is available and serves the SlipAI script.
+- Core onsite APIs are implemented:
+  - `/api/onsite/events`
+  - `/api/onsite/recommendation`
+  - `/api/onsite/chat`
+  - `/api/onsite/discovery`
+  - `/api/onsite/crawl`
+- Security controls are active via optional shared-secret, origin allowlist, and strict CORS handling.
+- Delivery is stable for both in-memory fallback and Supabase-backed persistence.
+- Crawler loop now supports bounded background discovery from visited storefront URLs.
 
-## 최근 점검 결과
-- `npm run lint`: 통과
-- `npm run build`(Next 16.2.6): 통과
-- 브랜치 정책 적용 전제: 유지보수 작업은 별도 브랜치에서만 수행
+## Recent Outcomes
+- `npm run lint`: pass
+- `npm run typecheck`: pass
+- `npm run build` (Next 16.2.6): pass
+- Manual behavior checks: widget event tracking and UI render still operational after crawler wiring.
 
-## 즉시 확인이 필요한 항목
-- `.env.local` 실서비스 값과 `.env.example`의 키 일치 여부
-- 위젯 삽입 페이지의 `data-*` 속성 누락/오타 여부
-- `ONSITE_WIDGET_ALLOWED_ORIGINS` 운영 환경 강제 설정 필요성
-
-## 리스크
-- 현재 프로젝트의 README/문서 일부 인코딩 이슈가 존재해 가독성이 다소 불안정
-- `demo`/테스트 페이지가 실제 실서비스와 완전히 동일한 DOM 구조를 대변하지 않을 수 있음
+## Next Checks
+- Register crawler summary observability for support ops.
+- Add minimal test coverage for discovery payload and crawl trigger endpoints.
+- Keep `ONSITE_WIDGET_SHARED_SECRET` + `ONSITE_WIDGET_ALLOWED_ORIGINS` set before production rollout.

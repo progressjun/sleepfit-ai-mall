@@ -1,16 +1,17 @@
-# 다음 작업 우선순위
+# Next Actions
 
-## 우선순위 A (이번 주)
-1. 위젯 동작 실환경 샘플 3개 템플릿으로 수동 점검
-2. `CHANGELOG.md` 항목 정리 후 팀 공유
-3. CI 실패 시 알림 채널/오너 지정
+## Priority 1
+1. Run verification pass on local store-crawl path:
+   - Start local dev server
+   - Install widget script on a sample page and confirm `POST /api/onsite/discovery` receives link payload
+   - Confirm crawl queue grows and `processCrawlQueue` stores products
+2. Add lightweight tests for `crawl` and `discovery` endpoints (payload validation + auth guard).
 
-## 우선순위 B (2주 내)
-1. 위젯 렌더링 폴백 테스트 케이스 추가 검토
-2. 추천 API 응답 스키마 호환성 회귀 체크
-3. 스크립트 설치 가이드 실제 운영 템플릿 반영 예시 확대
+## Priority 2
+1. Add observability counters in logs for crawl queue depth, error reasons, robots block ratio.
+2. Add simple dashboard endpoint for crawl summary for support operations.
 
-## 우선순위 C (1달 내)
-1. API 응답 지연 임계치 알림 대시보드 연동
-2. `readiness`/`canary` 모드로 무중단 배포 전환 검토
-3. 정기 보안 점검 항목(토큰 분리, 로그 보존주기) 점검
+## Priority 3
+1. Add optional `maxDepth`/`requestCap` controls in installation settings for brands that need stricter crawling policies.
+2. Expand widget UI copy for review-first banner cycle and low-bandwidth fallbacks.
+

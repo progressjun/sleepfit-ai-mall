@@ -6,7 +6,7 @@
   var widgetBrand = "SlipAI";
   if ((window.__C24AI && window.__C24AI.version) || (window.__SLIPAI && window.__SLIPAI.version)) return;
 
-  var VERSION = "0.2.1";
+  var VERSION = "0.2.2";
   var script =
     document.currentScript ||
     document.querySelector('script[src*="/widget/v1.js"]') ||
@@ -154,6 +154,47 @@
     };
   }
 
+  function isCandidatePath(pathname) {
+    if (!pathname) return false;
+    if (pathname.indexOf("/admin") === 0) return false;
+    if (pathname.indexOf("/member") === 0) return false;
+    if (pathname.indexOf("/order") === 0) return false;
+    if (pathname.indexOf("/cart") === 0) return false;
+    return true;
+  }
+
+  function collectDiscoveryLinks() {
+    var anchors = document.querySelectorAll("a[href]");
+    var links = [];
+    var origin = window.location.origin;
+    var productUrlHint = /\\/product\\//i;
+
+    for (var i = 0; i < anchors.length; i += 1) {
+      if (links.length >= 120) break;
+      var anchor = anchors[i];
+      var href = anchor.getAttribute("href");
+      if (!href) continue;
+
+      var raw = href.trim();
+      if (!raw || raw.indexOf("#") === 0 || raw.indexOf("javascript:") === 0 || raw.indexOf("mailto:") === 0 || raw.indexOf("tel:") === 0) {
+        continue;
+      }
+
+      try {
+        var parsed = new URL(raw, window.location.href);
+        if (parsed.origin !== origin) continue;
+        if (!isCandidatePath(parsed.pathname)) continue;
+        if (productUrlHint.test(window.location.pathname) && productUrlHint.test(parsed.pathname)) {
+          // keep if same page type.
+        }
+        var normalized = parsed.toString();
+        if (links.indexOf(normalized) === -1) links.push(normalized);
+      } catch (_) {}
+    }
+
+    return links.slice(0, 80);
+  }
+
   function pageContext() {
     return {
       url: window.location.href,
@@ -212,6 +253,27 @@
     } catch (_) {}
 
     return postJson("/api/onsite/events", payload).catch(function () {});
+  }
+
+  function sendDiscovery(force) {
+    var now = Date.now();
+    if (!force && discoveryInFlight) return;
+    if (!force && now - lastDiscoveryAt < 25000) return;
+
+    var links = collectDiscoveryLinks();
+    if (!links.length) return;
+    lastDiscoveryAt = now;
+
+    var payload = payloadBase();
+    payload.pageUrl = window.location.href;
+    payload.discoveredUrls = links;
+    discoveryInFlight = true;
+
+    postJson("/api/onsite/discovery", payload)
+      .catch(function () {})
+      .finally(function () {
+        discoveryInFlight = false;
+      });
   }
 
   function createHost() {
@@ -468,6 +530,9 @@
     }
   }
 
+  var discoveryInFlight = false;
+  var lastDiscoveryAt = 0;
+
   function requestRecommendation() {
     if (recommendationRequested) return;
     var product = detectProduct();
@@ -540,6 +605,7 @@
         clearDwell();
         clearBanner();
         track("page_view");
+        sendDiscovery();
 
         var product = detectProduct();
         if (product.pageType === "product_detail") {
@@ -616,6 +682,7 @@
 
   function init() {
     track("page_view");
+    sendDiscovery(true);
     currentRoute = getRouteKey();
     bindSpaNavigation();
 

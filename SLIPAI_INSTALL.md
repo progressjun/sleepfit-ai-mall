@@ -57,19 +57,22 @@ CAFE24_REDIRECT_URI=https://your-app-domain/api/cafe24/oauth/callback
 ## 4) Required pages
 
 - `GET /widget/v1.js`
-- `POST /api/onsite/events`
-- `POST /api/onsite/recommendation`
-- `POST /api/onsite/chat`
-- `GET /api/cafe24/oauth/start`
-- `GET /api/cafe24/oauth/callback`
-- `POST /api/cafe24/sync`
+ - `POST /api/onsite/events`
+ - `POST /api/onsite/recommendation`
+ - `POST /api/onsite/chat`
+ - `POST /api/onsite/discovery`
+ - `GET/POST /api/onsite/crawl`
+ - `GET /api/cafe24/oauth/start`
+ - `GET /api/cafe24/oauth/callback`
+ - `POST /api/cafe24/sync`
 
 ## 5) API flow
 
 1. Ingestor installs script only on the homepage.
-2. Admin connects Cafe24 via OAuth and runs `/api/cafe24/sync`.
-3. Products + reviews are cached into project DB (or memory fallback).
-4. Customers browse page; widget tracks behavior and requests recommendation/chat.
+2. On first visit, widget sends discovered URLs from the current page to `/api/onsite/discovery`.
+3. Crawler processes seed URLs in the background and stores products/reviews automatically.
+4. Admin runs existing Cafe24 sync for full catalog depth if needed (`/api/cafe24/sync`).
+5. Customers browse page; widget tracks behavior and requests recommendation/chat using crawled/synced product data.
 
 ## 6) Scope constraints
 

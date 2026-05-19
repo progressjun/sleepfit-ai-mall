@@ -53,6 +53,17 @@ export const onsiteEventRequestSchema = z.object({
   occurredAt: z.string().datetime().optional(),
 });
 
+export const onsiteDiscoveryRequestSchema = z.object({
+  projectKey: onsiteProjectKeySchema,
+  mallId: z.string().min(2).max(80),
+  widgetToken: z.string().max(512).optional(),
+  visitorId: z.string().min(8).max(120),
+  sessionId: z.string().min(8).max(120),
+  pageUrl: z.string().url(),
+  discoveredUrls: z.array(z.string().url()).max(400).default([]),
+  page: onsitePageContextSchema,
+});
+
 export const onsiteRecommendationRequestSchema = z.object({
   projectKey: onsiteProjectKeySchema,
   mallId: z.string().min(2).max(80),
@@ -99,6 +110,7 @@ export const cafe24SyncRequestSchema = z.object({
 
 export type OnsiteProductContext = z.infer<typeof onsiteProductContextSchema>;
 export type OnsiteEventRequest = z.infer<typeof onsiteEventRequestSchema>;
+export type OnsiteDiscoveryRequest = z.infer<typeof onsiteDiscoveryRequestSchema>;
 export type OnsiteRecommendationRequest = z.infer<typeof onsiteRecommendationRequestSchema>;
 export type OnsiteChatRequest = z.infer<typeof onsiteChatRequestSchema>;
 export type Cafe24SyncRequest = z.infer<typeof cafe24SyncRequestSchema>;

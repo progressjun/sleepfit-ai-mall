@@ -374,7 +374,7 @@
       var button = document.createElement("button");
       button.type = "button";
       button.className = "product-item product-card";
-      button.setAttribute("aria-label", item.name + " product");
+      button.setAttribute("aria-label", (item.name || "추천 상품") + " product");
       button.setAttribute("data-product-no", item.productNo || "");
 
       if (item.imageUrl) {
@@ -399,10 +399,10 @@
       kicker.textContent = "Recommended item " + (i + 1);
       var name = document.createElement("div");
       name.className = "product-name";
-      name.textContent = item.name;
+      name.textContent = item.name || "추천 상품";
       var reason = document.createElement("div");
       reason.className = "product-reason";
-      reason.textContent = item.reason;
+      reason.textContent = item.reason || "추천 사유가 준비 중입니다.";
       var price = document.createElement("div");
       price.className = "product-price";
       price.textContent = item.priceText || "";

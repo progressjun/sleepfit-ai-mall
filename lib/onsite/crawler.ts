@@ -405,7 +405,7 @@ function parseProductFromHtml(url: string, html: string) {
       : [
           {
             rating: 5,
-            content: "고객 후기 중 품질이 좋다는 평가가 반복되는 상품입니다.",
+            content: "Customers often report good quality and practical value in real use.",
             createdAt: undefined,
           },
         ],

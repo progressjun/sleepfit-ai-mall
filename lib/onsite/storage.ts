@@ -502,7 +502,7 @@ export async function getRelatedOnsiteProducts({
           typeof row.price === "number" || typeof row.price === "string"
             ? `${row.price}`
             : currentProduct.priceText,
-        imageUrl: typeof payload.image_url === "string" ? payload.image_url : currentProduct.imageUrl,
+        imageUrl: typeof payload.image_url === "string" ? payload.image_url : undefined,
         url: createProductUrl(currentProduct.url, externalProductId),
         reviewSummary:
           typeof payload.review_summary === "string"

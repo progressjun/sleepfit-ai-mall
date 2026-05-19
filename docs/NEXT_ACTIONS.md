@@ -8,6 +8,7 @@
    - Validate that discovered products include image URLs in stored payload.
 2. Add lightweight tests for `crawl` and `discovery` endpoints (payload validation + auth guard).
 3. Keep crawler smoke-test artifacts fresh: run script on `public/cafe24-widget-demo.html` after each rollout and verify banner + chat open + recommendation response after dwell.
+4. Verify related-product image usage in recommendation payload for storefront products.
 
 ## Priority 2
 1. Add observability counters in logs for crawl queue depth, error reasons, robots block ratio.

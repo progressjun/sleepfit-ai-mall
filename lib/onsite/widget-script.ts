@@ -6,7 +6,7 @@
   var widgetBrand = "SlipAI";
   if ((window.__C24AI && window.__C24AI.version) || (window.__SLIPAI && window.__SLIPAI.version)) return;
 
-  var VERSION = "0.2.2";
+  var VERSION = "0.2.3";
   var script =
     document.currentScript ||
     document.querySelector('script[src*="/widget/v1.js"]') ||

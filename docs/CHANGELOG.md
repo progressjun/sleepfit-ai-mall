@@ -19,6 +19,7 @@
   - Image candidate extraction now resolves relative paths and falls back to in-page images when OG/Twitter image tags are missing.
   - Crawl discovery now keeps search-category navigation links eligible (instead of hard-blocking `/search`), improving first-pass catalog sweep depth.
   - Removed synthetic review text injection from crawler seed parser so recommendations are based on real extracted review evidence only.
+- Fixed related product image handling in recommendation API: related products now use their own crawled image when available and no longer inherit the current product image as a fallback.
 
 ## 2026-05-19
 - Initial SlipAI MVP baseline (script install + event API + recommendation/chat flow, API verification + CI checks).

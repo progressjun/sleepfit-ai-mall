@@ -18,6 +18,10 @@ Put this single script in each Cafe24 HTML layer that runs on all pages (권장:
 `/widget/v1.js` is served from this app.  
 `data-widget-token` is optional when `ONSITE_WIDGET_SHARED_SECRET` is not set.
 
+You can also use `https://YOUR_APP_DOMAIN/api/widget/v1.js` (alias route works the same).
+
+For Cafe24, install once in the common footer/head script area so every page inherits the same script.
+
 ## 2) What gets installed
 
 - Only one SDK script is installed on the storefront.
@@ -86,12 +90,20 @@ SlipAI only answers within installed store context:
 
 ## 7) Cost estimate (initial baseline)
 
-Example assumption:  
-- 40,000 daily visitors, average 1 banner call + 1 chat call per 8 sessions  
-- 10,000 recommendation calls + 5,000 chat calls/day  
-- Token target: concise outputs + `gpt-5.4-nano` fallback to `gpt-4.1-mini`  
+Example assumption:
 
-Set `OPENAI_MODEL` and `ONSITE_OPENAI_MODEL` lower if daily budget is tight.
+- 40,000 daily visitors, and around 1 recommendation call + 1 chat call per 8 sessions
+  - Approx. 5,000 recommendation calls/day
+  - Approx. 5,000 chat calls/day
+- If average usage is 760 output tokens/request for recommendation and 870 output tokens/request for chat:
+  - Reco: 5,000 × 30 × 760 = 114,000,000 tokens/month
+  - Chat: 5,000 × 30 × 870 = 130,500,000 tokens/month
+  - Total: ~244,500,000 tokens/month before cache/retries
+
+For budget control:
+- Keep `ONSITE_OPENAI_MODEL=gpt-5.4-nano` and `ONSITE_OPENAI_MAX_OUTPUT_TOKENS=240`.
+- Reduce request payload with short histories and concise UI prompts.
+- Set `OPENAI_MODEL`/`ONSITE_OPENAI_MODEL` lower when needed.
 
 ## 8) Check list before publish
 

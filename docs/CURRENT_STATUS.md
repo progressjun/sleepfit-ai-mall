@@ -24,3 +24,4 @@
 - Register crawler summary observability for support ops.
 - Add minimal test coverage for discovery payload and crawl trigger endpoints.
 - Keep `ONSITE_WIDGET_SHARED_SECRET` + `ONSITE_WIDGET_ALLOWED_ORIGINS` set before production rollout.
+- Validate recommendation payload image quality (related product image fallback no longer inherits current product image).

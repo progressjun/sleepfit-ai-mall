@@ -6,7 +6,7 @@
   var widgetBrand = "SlipAI";
   if ((window.__C24AI && window.__C24AI.version) || (window.__SLIPAI && window.__SLIPAI.version)) return;
 
-  var VERSION = "0.2.3";
+  var VERSION = "0.2.4";
   var script =
     document.currentScript ||
     document.querySelector('script[src*="/widget/v1.js"]') ||
@@ -14,12 +14,32 @@
 
   if (!script) return;
 
-  var projectKey = script.getAttribute("data-project-key") || "";
-  var mallId = script.getAttribute("data-mall-id") || "";
-  var widgetToken = script.getAttribute("data-widget-token") || "";
-  var dwellSeconds = Math.max(5, Number(script.getAttribute("data-dwell-seconds") || "30"));
-  var debug = script.getAttribute("data-debug") === "true";
-  var apiBase = new URL(script.src, window.location.href).origin;
+  var queuedCommands =
+    window.slipai && window.slipai.q && typeof window.slipai.q.slice === "function"
+      ? window.slipai.q.slice(0)
+      : [];
+
+  function queuedInitConfig() {
+    for (var i = queuedCommands.length - 1; i >= 0; i -= 1) {
+      var command = queuedCommands[i];
+      if (!command || command[0] !== "init") continue;
+      if (command[1] && typeof command[1] === "object") return command[1];
+    }
+    return {};
+  }
+
+  var initConfig = queuedInitConfig();
+  var projectKey = script.getAttribute("data-project-key") || initConfig.projectKey || "";
+  var mallId = script.getAttribute("data-mall-id") || initConfig.mallId || "";
+  var widgetToken =
+    script.getAttribute("data-widget-token") ||
+    script.getAttribute("data-token") ||
+    initConfig.widgetToken ||
+    initConfig.token ||
+    "";
+  var dwellSeconds = Math.max(5, Number(script.getAttribute("data-dwell-seconds") || initConfig.dwellSeconds || "30"));
+  var debug = script.getAttribute("data-debug") === "true" || initConfig.debug === true;
+  var apiBase = initConfig.apiBase || new URL(script.src, window.location.href).origin;
 
   if (!projectKey || !mallId) {
     if (debug) console.warn("[" + widgetBrand + "] Missing data-project-key or data-mall-id.");
@@ -717,6 +737,41 @@
       },
     };
     window.__SLIPAI = window.__C24AI;
+
+    window.slipai = function (command, payload) {
+      if (command === "open" || command === "openChat") {
+        openChat();
+        return window.__C24AI;
+      }
+      if (command === "close" || command === "closeChat") {
+        closeChat();
+        return window.__C24AI;
+      }
+      if (command === "refresh" || command === "refreshProductContext") {
+        return window.__C24AI.refreshProductContext();
+      }
+      if (command === "getState") {
+        return window.__C24AI.getState();
+      }
+      if (command === "recommend" || command === "requestRecommendation") {
+        requestRecommendation();
+        return window.__C24AI;
+      }
+      if (command === "track") {
+        var eventName = typeof payload === "string" ? payload : payload && payload.eventName;
+        var metadata = payload && typeof payload === "object" ? payload.metadata || {} : {};
+        if (eventName) track(eventName, metadata);
+        return window.__C24AI;
+      }
+      return window.__C24AI;
+    };
+    window.slipai.version = VERSION;
+    window.slipai.q = [];
+
+    for (var i = 0; i < queuedCommands.length; i += 1) {
+      if (!queuedCommands[i] || queuedCommands[i][0] === "init") continue;
+      window.slipai.apply(window, queuedCommands[i]);
+    }
   }
 
   init();

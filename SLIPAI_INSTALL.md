@@ -22,6 +22,25 @@ You can also use `https://YOUR_APP_DOMAIN/api/widget/v1.js` (alias route works t
 
 For Cafe24, install once in the common footer/head script area so every page inherits the same script.
 
+Google/Meta-style init snippet is also supported:
+
+```html
+<script>
+  window.slipai =
+    window.slipai ||
+    function () {
+      (window.slipai.q = window.slipai.q || []).push(arguments);
+    };
+  window.slipai("init", {
+    projectKey: "pk_your_project_key",
+    mallId: "your_mall_id",
+    token: "optional_if_widget_secret_set",
+    dwellSeconds: 30
+  });
+</script>
+<script async src="https://YOUR_APP_DOMAIN/widget/v1.js"></script>
+```
+
 ## 2) What gets installed
 
 - Only one SDK script is installed on the storefront.

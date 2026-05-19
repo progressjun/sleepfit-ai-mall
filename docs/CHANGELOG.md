@@ -20,6 +20,8 @@
   - Crawl discovery now keeps search-category navigation links eligible (instead of hard-blocking `/search`), improving first-pass catalog sweep depth.
   - Removed synthetic review text injection from crawler seed parser so recommendations are based on real extracted review evidence only.
 - Fixed related product image handling in recommendation API: related products now use their own crawled image when available and no longer inherit the current product image as a fallback.
+- Added Google/Meta-style `window.slipai("init", ...)` queue compatibility so builders such as Lovable can install the widget with a two-script loader snippet.
+- Added `public/slipai-init-demo.html` to smoke-test init queue installs separately from the `data-*` install snippet.
 
 ## 2026-05-19
 - Initial SlipAI MVP baseline (script install + event API + recommendation/chat flow, API verification + CI checks).

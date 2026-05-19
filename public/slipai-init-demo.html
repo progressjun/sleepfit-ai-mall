@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="SlipAI Init Queue Demo" />
+    <meta property="og:image" content="/demo-product.svg" />
+    <meta property="product:price:amount" content="49000" />
+    <title>SlipAI Init Queue Demo</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #151515;
+        background: #f5f6f8;
+      }
+      main {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 48px 20px 140px;
+      }
+      .product {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        gap: 24px;
+        align-items: center;
+        padding: 28px;
+        border: 1px solid #dde2e8;
+        border-radius: 16px;
+        background: #fff;
+      }
+      .product-image {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border: 1px solid #e4e7eb;
+        border-radius: 18px;
+        background: #f7f7f8;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 32px;
+      }
+      .price {
+        font-size: 22px;
+        font-weight: 800;
+      }
+      .copy {
+        margin-top: 18px;
+        line-height: 1.7;
+      }
+      .btnBuy,
+      .btnBasket {
+        margin: 18px 8px 0 0;
+        padding: 13px 18px;
+        border: 0;
+        border-radius: 10px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .btnBuy {
+        color: #fff;
+        background: #111;
+      }
+      .btnBasket {
+        background: #e9edf2;
+      }
+      .spacer {
+        height: 900px;
+      }
+      @media (max-width: 720px) {
+        .product {
+          grid-template-columns: 1fr;
+        }
+        .product-image {
+          max-width: 220px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="product xans-product-detail" data-product-no="2001">
+        <img class="product-image" src="/demo-product.svg" alt="SlipAI product" />
+        <div>
+          <p>SlipAI Test Brand</p>
+          <h1>SlipAI Init Demo Product</h1>
+          <div id="span_product_price_text" class="price">49,000 KRW</div>
+          <p class="copy">
+            This page verifies the Google/Meta-style init queue snippet. The SDK should read
+            window.slipai("init", ...) and still render the floating advisor.
+          </p>
+          <button class="btnBuy" type="button">Buy now</button>
+          <button class="btnBasket" type="button">Add to cart</button>
+        </div>
+      </section>
+      <div class="spacer"></div>
+    </main>
+
+    <script>
+      window.slipai =
+        window.slipai ||
+        function () {
+          (window.slipai.q = window.slipai.q || []).push(arguments);
+        };
+      window.slipai("init", {
+        projectKey: "pk_demo",
+        mallId: "demo",
+        token: "demo_widget_token",
+        dwellSeconds: 5,
+        debug: true
+      });
+    </script>
+    <script async src="/widget/v1.js?v=init-demo"></script>
+  </body>
+</html>

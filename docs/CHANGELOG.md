@@ -14,6 +14,11 @@
 - Minor hardening polish:
   - Replaced unreadable fallback review text in crawler seed parser.
   - Cleaned demo validation page copy for "Talk to advisor" action test.
+- Added crawler extraction hardening for zero-action rollout:
+  - `product_no` extraction now supports path-style IDs (`/product/<id>`).
+  - Image candidate extraction now resolves relative paths and falls back to in-page images when OG/Twitter image tags are missing.
+  - Crawl discovery now keeps search-category navigation links eligible (instead of hard-blocking `/search`), improving first-pass catalog sweep depth.
+  - Removed synthetic review text injection from crawler seed parser so recommendations are based on real extracted review evidence only.
 
 ## 2026-05-19
 - Initial SlipAI MVP baseline (script install + event API + recommendation/chat flow, API verification + CI checks).

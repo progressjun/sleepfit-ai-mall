@@ -5,6 +5,7 @@
    - Start local dev server
    - Install widget script on a sample page and confirm `POST /api/onsite/discovery` receives link payload
    - Confirm crawl queue grows and `processCrawlQueue` stores products
+   - Validate that discovered products include image URLs in stored payload.
 2. Add lightweight tests for `crawl` and `discovery` endpoints (payload validation + auth guard).
 3. Keep crawler smoke-test artifacts fresh: run script on `public/cafe24-widget-demo.html` after each rollout and verify banner + chat open + recommendation response after dwell.
 

@@ -11,6 +11,8 @@
 - Security controls are active via optional shared-secret, origin allowlist, and strict CORS handling.
 - Delivery is stable for both in-memory fallback and Supabase-backed persistence.
 - Crawler loop now supports bounded background discovery from visited storefront URLs.
+- Crawl extraction now resolves relative asset URLs, captures in-page image fallbacks, and supports `product/<id>` style routes.
+- Review fallback for crawler ingestion avoids synthetic text injection; recommendations prioritize real extracted review evidence.
 
 ## Recent Outcomes
 - `npm run lint`: pass

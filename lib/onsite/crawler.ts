@@ -75,7 +75,7 @@ const DEFAULT_CONFIG: CrawlConfig = {
 };
 
 const IGNORE_PATTERNS = [
-  /\/(admin|member|my|member_|my_|order|checkout|cart|join|login|logout|search)/i,
+  /\/(admin|member|my|member_|my_|order|checkout|cart|join|login|logout)/i,
   /\.(?:css|js|json|xml|png|jpg|jpeg|gif|webp|svg|woff2?)(?:$|\?)/i,
   /\.pdf(?:$|\?)/i,
 ];
@@ -214,13 +214,21 @@ function looksLikeProductPath(url: string) {
 function getProductNoFromUrl(url: string) {
   try {
     const parsed = new URL(url);
-    return (
-      parsed.searchParams.get("product_no") ||
-      parsed.searchParams.get("productNo") ||
-      parsed.searchParams.get("product_id")
-    );
+    const queryNo = parsed.searchParams.get("product_no") || parsed.searchParams.get("productNo") || parsed.searchParams.get("product_id");
+    if (queryNo) return queryNo;
+
+    const pathMatch = parsed.pathname.match(/\/product\/(?:[^/]+\/)?([0-9]+)(?:[/?#]|$)/i);
+    return pathMatch?.[1] || null;
   } catch {
     return null;
+  }
+}
+
+function resolveUrl(raw: string, baseUrl: string) {
+  try {
+    return new URL(raw, baseUrl).toString();
+  } catch {
+    return "";
   }
 }
 
@@ -234,6 +242,16 @@ function parseMetaContent(html: string, keys: string[]) {
     if (match?.[1]) return match[1].trim();
   }
 
+  return "";
+}
+
+function parseImageFromHtml(html: string, baseUrl: string) {
+  const firstImgMatch = html.match(
+    /<img[^>]+src=["']([^"']+)["'][^>]*>(?:[\s\S]*?<img[^>]+src=["']([^"']+)["'][^>]*>)?/i,
+  );
+  if (firstImgMatch?.[1]) {
+    return resolveUrl(firstImgMatch[1], baseUrl);
+  }
   return "";
 }
 
@@ -327,7 +345,7 @@ function parseReviewsAndSummary(payloads: ParsedMetaPayload[]) {
   return { reviews, summary };
 }
 
-function parseProductFromJsonLd(item: ParsedMetaPayload) {
+function parseProductFromJsonLd(item: ParsedMetaPayload, baseUrl: string) {
   const asObject = item as Record<string, unknown>;
   const type = String(asObject["@type"] || "").toLowerCase();
   if (!type.includes("product")) return null;
@@ -361,7 +379,7 @@ function parseProductFromJsonLd(item: ParsedMetaPayload) {
   return {
     productNo,
     name: trimText(name, 180),
-    imageUrl: normalizeUrlValue(image),
+    imageUrl: resolveUrl(image, baseUrl),
     priceText: trimText(priceFromOffers, 80) || undefined,
     reviewSummary: summary || undefined,
     reviews: payloads.reviews,
@@ -374,7 +392,7 @@ function parseProductFromHtml(url: string, html: string) {
     const rawType = `${item["@type"] || ""}`.toLowerCase();
     return /product/.test(rawType);
   });
-  const parsedFromLd = productLd ? parseProductFromJsonLd(productLd) : null;
+  const parsedFromLd = productLd ? parseProductFromJsonLd(productLd, url) : null;
 
   const fallbackName =
     parseMetaContent(html, ["og:title", "twitter:title", "product_name"]) ||
@@ -382,7 +400,9 @@ function parseProductFromHtml(url: string, html: string) {
     "";
 
   const fallbackImage =
-    parseMetaContent(html, ["og:image", "twitter:image"]) || "";
+    parseMetaContent(html, ["og:image", "twitter:image"]) ||
+    parseMetaContent(html, ["og:image:url", "twitter:image:src"]) ||
+    parseImageFromHtml(html, url);
   const name = trimText((parsedFromLd?.name || fallbackName || "").trim(), 180);
   const priceText = trimText(parsedFromLd?.priceText || parsePriceFromPage(html) || "", 80);
 
@@ -391,7 +411,7 @@ function parseProductFromHtml(url: string, html: string) {
 
   const allReviews = parsedFromLd?.reviews || parseReviewRowsFromJsonLd(payloads);
   const summary = parsedFromLd?.reviewSummary || parseReviewsAndSummary(payloads).summary || "";
-  const imageUrl = normalizeUrlValue((parsedFromLd as { imageUrl?: string }).imageUrl || fallbackImage);
+  const imageUrl = resolveUrl((parsedFromLd as { imageUrl?: string }).imageUrl || fallbackImage, url);
   const productNo = parsedFromLd?.productNo || getProductNoFromUrl(url) || undefined;
 
   return {
@@ -400,15 +420,7 @@ function parseProductFromHtml(url: string, html: string) {
     imageUrl: imageUrl || undefined,
     priceText: priceText || undefined,
     reviewSummary: trimText(summary, 240) || undefined,
-    reviews: allReviews.length > 0
-      ? allReviews
-      : [
-          {
-            rating: 5,
-            content: "Customers often report good quality and practical value in real use.",
-            createdAt: undefined,
-          },
-        ],
+    reviews: allReviews,
   } as OnsiteProductSource;
 }
 

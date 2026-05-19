@@ -27,6 +27,8 @@ Put this single script in each Cafe24 HTML layer that runs on all pages (권장:
   - `dwell_30s` (after configured timeout on product pages)
   - `scroll`, `cart_click`, `chat_open`, `chat_message`, `banner_cta_click`
 - Recommendation API is called after 30s stay on product detail page.
+- Recommendation payload includes image URLs and review highlights from crawled/synced catalog data.
+- Discovery crawl starts from each page visit (home/detail/list/search/category links) and runs in background automatically.
 - Recommendation data is returned from server-side OpenAI + local policy; browser never receives your OpenAI key.
 
 ## 3) Required server settings
@@ -71,8 +73,8 @@ CAFE24_REDIRECT_URI=https://your-app-domain/api/cafe24/oauth/callback
 1. Ingestor installs script only on the homepage.
 2. On first visit, widget sends discovered URLs from the current page to `/api/onsite/discovery`.
 3. Crawler processes seed URLs in the background and stores products/reviews automatically.
-4. Admin runs existing Cafe24 sync for full catalog depth if needed (`/api/cafe24/sync`).
-5. Customers browse page; widget tracks behavior and requests recommendation/chat using crawled/synced product data.
+4. Full catalog depth can be improved by running existing Cafe24 sync for authoritative product metadata (`/api/cafe24/sync`) when desired.
+5. Customers browse page; widget tracks behavior and requests recommendation/chat using crawled and synced product data.
 
 ## 6) Scope constraints
 

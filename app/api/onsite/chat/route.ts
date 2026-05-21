@@ -50,6 +50,64 @@ function sanitizeProducts<
   return products.filter((product) => isAllowedProduct(product, allowed)).slice(0, 3);
 }
 
+function sameProductIdentity(
+  product: { productNo?: string | number | null; name?: string | null },
+  current: { productNo?: string | number | null; name?: string | null },
+) {
+  const productNo = product.productNo == null ? "" : String(product.productNo).trim();
+  const currentNo = current.productNo == null ? "" : String(current.productNo).trim();
+  if (productNo && currentNo && productNo === currentNo) return true;
+  return Boolean(product.name && current.name && normalizeText(product.name) === normalizeText(current.name));
+}
+
+function toChatProduct(product: {
+  productNo?: string | number | null;
+  name?: string | null;
+  reviewSummary?: string | null;
+  priceText?: string | null;
+  imageUrl?: string | null;
+  url?: string | null;
+}) {
+  return {
+    productNo: product.productNo == null ? null : String(product.productNo),
+    name: product.name || "추천 상품",
+    reason: product.reviewSummary || "현재 상품과 함께 비교하기 좋은 같은 쇼핑몰 상품입니다.",
+    priceText: product.priceText ?? null,
+    imageUrl: product.imageUrl ?? null,
+    url: product.url ?? null,
+  };
+}
+
+function resolveChatProducts({
+  aiProducts,
+  relatedProducts,
+  knowledge,
+  allowedCatalog,
+}: {
+  aiProducts: Array<{
+    productNo?: string | null;
+    name?: string | null;
+    reason?: string | null;
+    priceText?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  }>;
+  relatedProducts: Awaited<ReturnType<typeof getRelatedOnsiteProducts>>;
+  knowledge: Awaited<ReturnType<typeof getOnsiteKnowledge>>;
+  allowedCatalog: ReturnType<typeof buildAllowedCatalog>;
+}) {
+  const sanitizedAi = sanitizeProducts(aiProducts, allowedCatalog);
+  const hasAlternative = sanitizedAi.some((product) => !sameProductIdentity(product, knowledge));
+  if (sanitizedAi.length > 0 && hasAlternative) return sanitizedAi;
+
+  const fallback = sanitizeProducts(
+    relatedProducts.filter((product) => !sameProductIdentity(product, knowledge)).map(toChatProduct),
+    allowedCatalog,
+  );
+
+  return fallback.length > 0 ? fallback : sanitizedAi;
+}
+
 export async function POST(request: Request) {
   const parsed = onsiteChatRequestSchema.safeParse(await request.json().catch(() => null));
 
@@ -149,12 +207,18 @@ export async function POST(request: Request) {
   });
 
   const conversationId = await recordChatExchange(parsed.data, result.data.message);
+  const products = resolveChatProducts({
+    aiProducts: result.data.products,
+    relatedProducts,
+    knowledge,
+    allowedCatalog,
+  });
 
   return NextResponse.json(
     {
       data: {
         ...result.data,
-        products: sanitizeProducts(result.data.products, allowedCatalog),
+        products,
       },
       source: result.source,
       conversationId,

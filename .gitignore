@@ -32,7 +32,9 @@ yarn-error.log*
 next-dev.*.log
 tmp-*.log
 tmp-dev*.log
+temp-*.log
 .tmp/
+cloudflared.exe
 
 # env files (can opt-in for committing if needed)
 .env*

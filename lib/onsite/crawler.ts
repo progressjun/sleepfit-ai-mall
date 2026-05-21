@@ -419,6 +419,7 @@ function parseProductFromHtml(url: string, html: string) {
     name,
     imageUrl: imageUrl || undefined,
     priceText: priceText || undefined,
+    url,
     reviewSummary: trimText(summary, 240) || undefined,
     reviews: allReviews,
   } as OnsiteProductSource;

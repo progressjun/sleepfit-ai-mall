@@ -7,7 +7,7 @@ Put this single script in each Cafe24 HTML layer that runs on all pages (권장:
 ```html
 <script
   async
-  src="https://YOUR_APP_DOMAIN/widget/v1.js"
+  src="https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js?v=0.3.1-ko-20260521"
   data-project-key="pk_your_project_key"
   data-mall-id="your_mall_id"
   data-widget-token="optional_if_widget_secret_set"
@@ -15,12 +15,15 @@ Put this single script in each Cafe24 HTML layer that runs on all pages (권장:
 ></script>
 ```
 
-`/widget/v1.js` is served from this app.  
+`/widget/v1.js` is served from the deployed SlipAI app.
 `data-widget-token` is optional when `ONSITE_WIDGET_SHARED_SECRET` is not set.
 
-You can also use `https://YOUR_APP_DOMAIN/api/widget/v1.js` (alias route works the same).
+You can also use `https://YOUR_SLIPAI_PROJECT.vercel.app/api/widget/v1.js` (alias route works the same).
 
 For Cafe24, install once in the common footer/head script area so every page inherits the same script.
+
+For real advertiser/customer traffic, use the Vercel production URL or a custom domain connected to Vercel.
+Local tunnels are only for short smoke tests because they depend on the local PC staying online.
 
 Google/Meta-style init snippet is also supported:
 
@@ -38,7 +41,7 @@ Google/Meta-style init snippet is also supported:
     dwellSeconds: 30
   });
 </script>
-<script async src="https://YOUR_APP_DOMAIN/widget/v1.js"></script>
+<script async src="https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js?v=0.3.1-ko-20260521"></script>
 ```
 
 ## 2) What gets installed
@@ -50,6 +53,8 @@ Google/Meta-style init snippet is also supported:
   - `dwell_30s` (after configured timeout on product pages)
   - `scroll`, `cart_click`, `chat_open`, `chat_message`, `banner_cta_click`
 - Recommendation API is called after 30s stay on product detail page.
+- Recommendation API can also run on cart-click comparison and desktop exit-intent triggers.
+- Session frequency is capped by default to avoid excessive popups (`data-session-frequency-cap`, default `3`).
 - Recommendation payload includes image URLs and review highlights from crawled/synced catalog data.
 - Discovery crawl starts from each page visit (home/detail/list/search/category links) and runs in background automatically.
 - Recommendation data is returned from server-side OpenAI + local policy; browser never receives your OpenAI key.
@@ -60,13 +65,14 @@ In `.env.local` (server only):
 
 ```bash
 OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-5.4-mini
-OPENAI_FALLBACK_MODEL=gpt-4.1-mini
+OPENAI_MODEL=gpt-5-mini
+OPENAI_FALLBACK_MODEL=
 OPENAI_REASONING_EFFORT=minimal
+OPENAI_MAX_OUTPUT_TOKENS=1500
 
-ONSITE_OPENAI_MODEL=gpt-5.4-nano
-ONSITE_OPENAI_FALLBACK_MODEL=gpt-4.1-mini
-ONSITE_OPENAI_MAX_OUTPUT_TOKENS=240
+ONSITE_OPENAI_MODEL=gpt-5-mini
+ONSITE_OPENAI_FALLBACK_MODEL=
+ONSITE_OPENAI_MAX_OUTPUT_TOKENS=900
 
 ONSITE_WIDGET_ALLOWED_ORIGINS="https://your-mall.cafe24.com"   # production should be strict
 ONSITE_WIDGET_SHARED_SECRET=optional_shared_secret
@@ -76,8 +82,11 @@ ONSITE_RATE_LIMIT_CHAT=120
 
 CAFE24_CLIENT_ID=...
 CAFE24_CLIENT_SECRET=...
-CAFE24_REDIRECT_URI=https://your-app-domain/api/cafe24/oauth/callback
+CAFE24_REDIRECT_URI=https://YOUR_SLIPAI_PROJECT.vercel.app/api/cafe24/oauth/callback
 ```
+
+For Vercel production, set these in Vercel Project Settings -> Environment Variables, not in GitHub code.
+See `docs/VERCEL_DEPLOYMENT.md`.
 
 ## 4) Required pages
 
@@ -86,7 +95,8 @@ CAFE24_REDIRECT_URI=https://your-app-domain/api/cafe24/oauth/callback
  - `POST /api/onsite/recommendation`
  - `POST /api/onsite/chat`
  - `POST /api/onsite/discovery`
- - `GET/POST /api/onsite/crawl`
+- `GET/POST /api/onsite/crawl`
+ - `GET /api/onsite/ops`
  - `GET /api/cafe24/oauth/start`
  - `GET /api/cafe24/oauth/callback`
  - `POST /api/cafe24/sync`
@@ -120,9 +130,9 @@ Example assumption:
   - Total: ~244,500,000 tokens/month before cache/retries
 
 For budget control:
-- Keep `ONSITE_OPENAI_MODEL=gpt-5.4-nano` and `ONSITE_OPENAI_MAX_OUTPUT_TOKENS=240`.
+- Keep `ONSITE_OPENAI_MODEL=gpt-5-mini`, `ONSITE_OPENAI_REASONING_EFFORT=minimal`, and concise prompts.
 - Reduce request payload with short histories and concise UI prompts.
-- Set `OPENAI_MODEL`/`ONSITE_OPENAI_MODEL` lower when needed.
+- Add caching/catalog precomputation before scaling to heavy production traffic.
 
 ## 8) Check list before publish
 

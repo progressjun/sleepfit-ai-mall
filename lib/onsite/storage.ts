@@ -30,7 +30,7 @@ interface MemoryStore {
   installations: Map<string, InstallationRecord>;
   events: OnsiteEventRequest[];
   products: Map<string, OnsiteProductSource[]>;
-  chatMessages: Array<{ request: OnsiteChatRequest; answer: string; createdAt: string }>;
+  chatMessages: Array<{ request: OnsiteChatRequest; answer: string; blockedByScope?: boolean; createdAt: string }>;
   recommendationLogs: Array<{ request: OnsiteRecommendationRequest; output: unknown; createdAt: string }>;
   cafe24Tokens: Map<string, Cafe24TokenRecord>;
 }
@@ -45,6 +45,39 @@ interface Cafe24TokenRecord {
 interface Cafe24TokenInput extends Cafe24TokenRecord {
   projectKey: string;
   mallId: string;
+}
+
+export interface OnsiteOpsSummary {
+  installation: {
+    id: string;
+    projectKey: string;
+    mallId: string;
+    status: string;
+    allowedOrigins: string[];
+    hasWidgetSecret: boolean;
+  };
+  counters: {
+    events: number;
+    recommendations: number;
+    bannerCtaClicks: number;
+    chatMessages: number;
+    blockedChatMessages: number;
+  };
+  eventCounts: Record<string, number>;
+  recentEvents: Array<{
+    eventName: string;
+    pageUrl?: string;
+    productName?: string;
+    createdAt: string;
+  }>;
+  installedSites: Array<{
+    origin: string;
+    pageCount: number;
+    eventCount: number;
+    lastSeenAt: string;
+    lastPageUrl?: string;
+    productNames: string[];
+  }>;
 }
 
 const globalStore = globalThis as typeof globalThis & {
@@ -275,14 +308,23 @@ export async function recordRecommendationLog(request: OnsiteRecommendationReque
   }
 }
 
-export async function recordChatExchange(request: OnsiteChatRequest, answer: string) {
+export async function recordChatExchange(
+  request: OnsiteChatRequest,
+  answer: string,
+  options: { blockedByScope?: boolean } = {},
+) {
   const maskedRequest = maskPIIInObject(request);
   const maskedAnswer = maskPIIInObject(answer);
   const installation = await ensureInstallation(request.projectKey, request.mallId);
   const supabase = createServerSupabaseClient();
 
   if (!supabase) {
-    memoryStore().chatMessages.push({ request: maskedRequest, answer: maskedAnswer, createdAt: new Date().toISOString() });
+    memoryStore().chatMessages.push({
+      request: maskedRequest,
+      answer: maskedAnswer,
+      blockedByScope: options.blockedByScope,
+      createdAt: new Date().toISOString(),
+    });
     return request.conversationId || `${request.sessionId}_chat`;
   }
 
@@ -317,7 +359,7 @@ export async function recordChatExchange(request: OnsiteChatRequest, answer: str
         chat_session_id: sessionId,
         role: "assistant",
         content: maskedAnswer,
-        metadata: {},
+        metadata: { blockedByScope: options.blockedByScope === true },
       },
     ]);
 
@@ -326,9 +368,232 @@ export async function recordChatExchange(request: OnsiteChatRequest, answer: str
     memoryStore().chatMessages.push({
       request: maskedRequest,
       answer: maskedAnswer,
+      blockedByScope: options.blockedByScope,
       createdAt: new Date().toISOString(),
     });
     return maskedRequest.conversationId || `${maskedRequest.sessionId}_chat`;
+  }
+}
+
+function buildEventCounts(events: Array<{ eventName: string }>) {
+  return events.reduce<Record<string, number>>((counts, event) => {
+    counts[event.eventName] = (counts[event.eventName] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+function productNameFromContext(value: unknown) {
+  if (!value || typeof value !== "object") return undefined;
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.name === "string" ? candidate.name : undefined;
+}
+
+function buildInstalledSites(
+  events: Array<{
+    eventName: string;
+    pageUrl?: string;
+    productName?: string;
+    createdAt: string;
+  }>,
+) {
+  const sites = new Map<
+    string,
+    {
+      origin: string;
+      pages: Set<string>;
+      eventCount: number;
+      lastSeenAt: string;
+      lastPageUrl?: string;
+      productNames: Set<string>;
+    }
+  >();
+
+  for (const event of events) {
+    if (!event.pageUrl) continue;
+
+    let parsed: URL;
+    try {
+      parsed = new URL(event.pageUrl);
+    } catch {
+      continue;
+    }
+
+    const existing =
+      sites.get(parsed.origin) ??
+      {
+        origin: parsed.origin,
+        pages: new Set<string>(),
+        eventCount: 0,
+        lastSeenAt: event.createdAt,
+        lastPageUrl: event.pageUrl,
+        productNames: new Set<string>(),
+      };
+
+    existing.pages.add(event.pageUrl);
+    existing.eventCount += 1;
+    if (new Date(event.createdAt).getTime() >= new Date(existing.lastSeenAt).getTime()) {
+      existing.lastSeenAt = event.createdAt;
+      existing.lastPageUrl = event.pageUrl;
+    }
+    if (event.productName) existing.productNames.add(event.productName);
+    sites.set(parsed.origin, existing);
+  }
+
+  return Array.from(sites.values())
+    .sort((a, b) => new Date(b.lastSeenAt).getTime() - new Date(a.lastSeenAt).getTime())
+    .map((site) => ({
+      origin: site.origin,
+      pageCount: site.pages.size,
+      eventCount: site.eventCount,
+      lastSeenAt: site.lastSeenAt,
+      lastPageUrl: site.lastPageUrl,
+      productNames: Array.from(site.productNames).slice(0, 5),
+    }));
+}
+
+function memoryOpsSummary(installation: InstallationRecord): OnsiteOpsSummary {
+  const store = memoryStore();
+  const events = store.events.filter(
+    (event) => event.projectKey === installation.projectKey && event.mallId === installation.mallId,
+  );
+  const recommendations = store.recommendationLogs.filter(
+    (log) => log.request.projectKey === installation.projectKey && log.request.mallId === installation.mallId,
+  );
+  const chatMessages = store.chatMessages.filter(
+    (message) =>
+      message.request.projectKey === installation.projectKey && message.request.mallId === installation.mallId,
+  );
+
+  const recentEvents = events
+    .slice(-25)
+    .reverse()
+    .map((event) => ({
+      eventName: event.eventName,
+      pageUrl: event.page.url,
+      productName: event.product?.name,
+      createdAt: event.occurredAt ?? new Date().toISOString(),
+    }));
+  const normalizedEvents = events.map((event) => ({
+    eventName: event.eventName,
+    pageUrl: event.page.url,
+    productName: event.product?.name,
+    createdAt: event.occurredAt ?? new Date().toISOString(),
+  }));
+
+  return {
+    installation: {
+      id: installation.id,
+      projectKey: installation.projectKey,
+      mallId: installation.mallId,
+      status: installation.status,
+      allowedOrigins: resolveAllowedOrigins({ installation }),
+      hasWidgetSecret: Boolean(getWidgetSecretFromSettings(installation.settings) ?? DEFAULT_WIDGET_SECRET),
+    },
+    counters: {
+      events: events.length,
+      recommendations: recommendations.length,
+      bannerCtaClicks: events.filter((event) => event.eventName === "banner_cta_click").length,
+      chatMessages: chatMessages.length,
+      blockedChatMessages: chatMessages.filter((message) => message.blockedByScope).length,
+    },
+    eventCounts: buildEventCounts(events),
+    recentEvents,
+    installedSites: buildInstalledSites(normalizedEvents),
+  };
+}
+
+export async function getOnsiteOpsSummary({
+  projectKey,
+  mallId,
+}: {
+  projectKey: string;
+  mallId: string;
+}): Promise<OnsiteOpsSummary> {
+  const installation = await ensureInstallation(projectKey, mallId);
+  const supabase = createServerSupabaseClient();
+
+  if (!supabase) {
+    return memoryOpsSummary(installation);
+  }
+
+  try {
+    const eventCountResult = await supabase
+      .from("onsite_events")
+      .select("id", { count: "exact", head: true })
+      .eq("installation_id", installation.id);
+    const bannerCtaCountResult = await supabase
+      .from("onsite_events")
+      .select("id", { count: "exact", head: true })
+      .eq("installation_id", installation.id)
+      .eq("event_name", "banner_cta_click");
+    const recommendationCountResult = await supabase
+      .from("ai_recommendation_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("installation_id", installation.id);
+    const eventRowsResult = await supabase
+      .from("onsite_events")
+      .select("event_name,page_url,product_context,created_at")
+      .eq("installation_id", installation.id)
+      .order("created_at", { ascending: false })
+      .limit(500);
+    const chatSessionsResult = await supabase
+      .from("chat_sessions")
+      .select("id")
+      .eq("installation_id", installation.id)
+      .order("last_message_at", { ascending: false })
+      .limit(1000);
+
+    const eventRows = (eventRowsResult.data as Array<Record<string, unknown>> | null) ?? [];
+    const chatSessionIds =
+      (chatSessionsResult.data as Array<Record<string, unknown>> | null)
+        ?.map((row) => (typeof row.id === "string" ? row.id : ""))
+        .filter(Boolean) ?? [];
+    let chatMessages = 0;
+    let blockedChatMessages = 0;
+
+    if (chatSessionIds.length > 0) {
+      const chatMessagesResult = await supabase
+        .from("chat_messages")
+        .select("role,metadata")
+        .in("chat_session_id", chatSessionIds)
+        .limit(1000);
+      const rows = (chatMessagesResult.data as Array<Record<string, unknown>> | null) ?? [];
+      chatMessages = rows.filter((row) => row.role === "visitor").length;
+      blockedChatMessages = rows.filter((row) => {
+        const metadata = row.metadata as Record<string, unknown> | null;
+        return row.role === "assistant" && metadata?.blockedByScope === true;
+      }).length;
+    }
+
+    const normalizedEvents = eventRows.map((row) => ({
+      eventName: String(row.event_name || "unknown"),
+      pageUrl: typeof row.page_url === "string" ? row.page_url : undefined,
+      productName: productNameFromContext(row.product_context),
+      createdAt: typeof row.created_at === "string" ? row.created_at : new Date().toISOString(),
+    }));
+
+    return {
+      installation: {
+        id: installation.id,
+        projectKey: installation.projectKey,
+        mallId: installation.mallId,
+        status: installation.status,
+        allowedOrigins: resolveAllowedOrigins({ installation }),
+        hasWidgetSecret: Boolean(getWidgetSecretFromSettings(installation.settings) ?? DEFAULT_WIDGET_SECRET),
+      },
+      counters: {
+        events: eventCountResult.count ?? normalizedEvents.length,
+        recommendations: recommendationCountResult.count ?? 0,
+        bannerCtaClicks: bannerCtaCountResult.count ?? 0,
+        chatMessages,
+        blockedChatMessages,
+      },
+      eventCounts: buildEventCounts(normalizedEvents),
+      recentEvents: normalizedEvents.slice(0, 25),
+      installedSites: buildInstalledSites(normalizedEvents),
+    };
+  } catch {
+    return memoryOpsSummary(installation);
   }
 }
 
@@ -356,6 +621,76 @@ function createProductUrl(baseUrl: string | undefined, productNo: string) {
   } catch {
     return baseUrl;
   }
+}
+
+function productIdentity(product: OnsiteProductSource) {
+  return String(product.productNo || product.url || product.name).trim().toLowerCase();
+}
+
+function mergeProductCatalog(existing: OnsiteProductSource[], incoming: OnsiteProductSource[]) {
+  const merged = new Map<string, OnsiteProductSource>();
+
+  for (const product of existing) {
+    const key = productIdentity(product);
+    if (key) merged.set(key, product);
+  }
+
+  for (const product of incoming) {
+    const key = productIdentity(product);
+    if (!key) continue;
+    const previous = merged.get(key);
+    merged.set(key, {
+      ...previous,
+      ...product,
+      reviews: product.reviews.length > 0 ? product.reviews : previous?.reviews ?? [],
+    });
+  }
+
+  return Array.from(merged.values());
+}
+
+function positiveReviewCount(product: OnsiteProductSource) {
+  return product.reviews.filter((review) => review.rating >= 4 && review.content.trim()).length;
+}
+
+function sortFeaturedProducts(products: OnsiteProductSource[]) {
+  return [...products].sort((a, b) => {
+    const imageScore = Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl));
+    if (imageScore !== 0) return imageScore;
+
+    const reviewScore = positiveReviewCount(b) - positiveReviewCount(a);
+    if (reviewScore !== 0) return reviewScore;
+
+    return a.name.localeCompare(b.name, "ko");
+  });
+}
+
+function payloadFromRow(row: Record<string, unknown>) {
+  return row.source_payload && typeof row.source_payload === "object"
+    ? (row.source_payload as Record<string, unknown>)
+    : {};
+}
+
+function productSourceFromRow(row: Record<string, unknown>, fallback?: OnsiteProductSource): OnsiteProductSource {
+  const payload = payloadFromRow(row);
+  const externalProductId = String(row.external_product_id || "");
+  const priceText =
+    typeof row.price === "number" || typeof row.price === "string"
+      ? `${row.price}`
+      : fallback?.priceText;
+
+  return {
+    productNo: externalProductId,
+    name: String(row.name || fallback?.name || "추천 상품"),
+    priceText,
+    imageUrl: typeof payload.image_url === "string" ? payload.image_url : fallback?.imageUrl,
+    url: typeof payload.url === "string" ? payload.url : createProductUrl(fallback?.url, externalProductId),
+    reviewSummary:
+      typeof payload.review_summary === "string"
+        ? payload.review_summary
+        : "리뷰 반응과 상품 정보를 기준으로 함께 살펴보기 좋은 상품입니다.",
+    reviews: fallback?.reviews ?? [],
+  };
 }
 
 export async function getOnsiteKnowledge({
@@ -439,7 +774,7 @@ export async function getOnsiteKnowledge({
         ? `${productRow.price}`
         : product?.priceText,
     imageUrl: typeof payload.image_url === "string" ? payload.image_url : product?.imageUrl,
-    url: product?.url,
+    url: typeof payload.url === "string" ? payload.url : product?.url,
     reviewSummary: typeof payload.review_summary === "string" ? payload.review_summary : fallback.reviewSummary,
     reviews: reviews.length > 0 ? reviews : fallback.reviews,
   };
@@ -467,6 +802,7 @@ export async function getRelatedOnsiteProducts({
         const itemNo = item.productNo == null ? "" : String(item.productNo);
         return itemNo !== currentProductNo && item.name.toLowerCase() !== currentProduct.name.toLowerCase();
       })
+      .sort((a, b) => Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl)))
       .slice(0, limit);
 
     return related.length > 0 ? related : fallback;
@@ -488,33 +824,53 @@ export async function getRelatedOnsiteProducts({
   const relatedResult = await relatedQuery;
   const rows = (relatedResult.data as Array<Record<string, unknown>> | null) || [];
   const related = rows
-    .map((row) => {
-      const externalProductId = String(row.external_product_id || "");
-      const payload =
-        row.source_payload && typeof row.source_payload === "object"
-          ? (row.source_payload as Record<string, unknown>)
-          : {};
-
-      return {
-        productNo: externalProductId,
-        name: String(row.name || "추천 상품"),
-        priceText:
-          typeof row.price === "number" || typeof row.price === "string"
-            ? `${row.price}`
-            : currentProduct.priceText,
-        imageUrl: typeof payload.image_url === "string" ? payload.image_url : undefined,
-        url: createProductUrl(currentProduct.url, externalProductId),
-        reviewSummary:
-          typeof payload.review_summary === "string"
-            ? payload.review_summary
-            : "현재 보고 있는 상품과 함께 비교하기 좋은 상품입니다.",
-        reviews: currentProduct.reviews,
-      } satisfies OnsiteProductSource;
-    })
+    .map((row) => productSourceFromRow(row, currentProduct))
     .filter((item) => item.productNo && item.name.toLowerCase() !== currentProduct.name.toLowerCase())
+    .sort((a, b) => Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl)))
     .slice(0, limit);
 
   return related.length > 0 ? related : fallback;
+}
+
+export async function getFeaturedOnsiteProducts({
+  projectKey,
+  mallId,
+  limit = 3,
+}: {
+  projectKey: string;
+  mallId: string;
+  limit?: number;
+}) {
+  const fallback = createMockRelatedProducts(
+    createFallbackProduct({
+      pageType: "home",
+      name: "추천 상품",
+    }),
+    limit,
+  );
+  const supabase = createServerSupabaseClient();
+
+  if (!supabase) {
+    const products = memoryStore().products.get(keyFor(projectKey, mallId)) || [];
+    const featured = sortFeaturedProducts(products.filter((product) => product.name.trim())).slice(0, limit);
+    return featured.length > 0 ? featured : fallback;
+  }
+
+  const installation = await ensureInstallation(projectKey, mallId);
+  if (!installation.projectId) return fallback;
+
+  const productsResult = await supabase
+    .from("products")
+    .select("external_product_id,name,price,source_payload")
+    .eq("project_id", installation.projectId)
+    .limit(Math.max(limit * 4, 12));
+  const rows = (productsResult.data as Array<Record<string, unknown>> | null) || [];
+  const featured = sortFeaturedProducts(rows.map((row) => productSourceFromRow(row)).filter((product) => product.name.trim())).slice(
+    0,
+    limit,
+  );
+
+  return featured.length > 0 ? featured : fallback;
 }
 
 export async function storeCafe24Token(input: Cafe24TokenInput) {
@@ -595,7 +951,8 @@ export async function storeSyncedProducts(sync: Cafe24SyncRequest, products: Ons
   const supabase = createServerSupabaseClient();
   const storeKey = keyFor(sync.projectKey, sync.mallId);
 
-  memoryStore().products.set(storeKey, products);
+  const existingProducts = memoryStore().products.get(storeKey) || [];
+  memoryStore().products.set(storeKey, mergeProductCatalog(existingProducts, products));
 
   if (!supabase) return { stored: "memory" as const, productCount: products.length };
 
@@ -611,6 +968,7 @@ export async function storeSyncedProducts(sync: Cafe24SyncRequest, products: Ons
         price: Number(String(product.priceText || "").replace(/[^0-9.]/g, "")) || null,
         source_payload: {
           image_url: product.imageUrl,
+          url: product.url,
           review_summary: product.reviewSummary,
           mall_id: sync.mallId,
         },

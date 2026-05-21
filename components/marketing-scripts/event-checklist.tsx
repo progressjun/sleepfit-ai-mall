@@ -3,7 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ScriptsAIOutput } from "@/lib/ai/schemas";
 
 export function EventChecklist({ guide }: { guide?: ScriptsAIOutput }) {
-  const events = guide?.requiredEvents ?? ["page_view", "view_item", "add_to_cart", "begin_checkout", "purchase", "sign_up", "generate_lead"];
+  const events = guide?.requiredEvents ?? [
+    "page_view",
+    "dwell_30s",
+    "scroll",
+    "cart_click",
+    "chat_open",
+    "chat_message",
+    "banner_cta_click",
+  ];
   return (
     <Card className="border-slate-200 bg-white shadow-sm">
       <CardHeader>

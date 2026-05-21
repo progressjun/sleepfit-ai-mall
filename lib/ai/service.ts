@@ -85,13 +85,23 @@ export async function generateStructuredOutput<TSchema extends z.ZodType>({
     };
   };
 
+  const taskSystemPrompt = taskName.startsWith("onsite_")
+    ? [
+        "You are SlipAI, an onsite AI shopping advisor for one installed Korean commerce mall.",
+        "Return only valid JSON that matches the provided schema.",
+        "Write shopper-facing text in concise natural Korean.",
+        "Use only the supplied mall product, review, option, shipping, return, and purchase context.",
+        "Do not answer coding, finance, news, politics, general knowledge, competitors, or unrelated brand questions.",
+      ].join(" ")
+    : systemPrompt;
+
   const buildRequest = (model: string, withReasoning: boolean) => {
     const supportsTemperature = !/^gpt-5/i.test(String(model));
     const reasoningEffort = getOpenAIReasoningEffortFromString(model, overrideReasoningEffort) || undefined;
 
     const base = {
       model: model as ResponseCreateParamsNonStreaming["model"],
-      instructions: systemPrompt,
+      instructions: taskSystemPrompt,
       input: `${prompt}\n\nInput: ${JSON.stringify(maskedInput)}`,
       max_output_tokens: maxOutputTokens,
       prompt_cache_key: taskName,
@@ -110,8 +120,23 @@ export async function generateStructuredOutput<TSchema extends z.ZodType>({
     return base;
   };
 
-  const parseStructured = (response: { output_text: string; usage?: unknown }) => {
-    const payload = schema.parse(JSON.parse(response.output_text));
+  const parseStructured = (response: { output_text: string; usage?: unknown; status?: string; incomplete_details?: unknown }) => {
+    let parsedJson: unknown;
+    try {
+      parsedJson = JSON.parse(response.output_text);
+    } catch (error) {
+      throw new Error(
+        [
+          error instanceof Error ? error.message : String(error),
+          `status=${response.status || "unknown"}`,
+          `outputChars=${response.output_text.length}`,
+          `usage=${JSON.stringify(response.usage || null)}`,
+          `incomplete=${JSON.stringify(response.incomplete_details || null)}`,
+        ].join(" "),
+      );
+    }
+
+    const payload = schema.parse(parsedJson);
     return { data: payload, usage: normalizeUsage(response.usage as OpenAIUsage | undefined) };
   };
 

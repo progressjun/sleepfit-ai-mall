@@ -1,17 +1,17 @@
 # Next Actions
 
 ## Priority 1
-1. Run verification pass on local store-crawl path:
-   - Start local dev server
-   - Install widget script on a sample page and confirm `POST /api/onsite/discovery` receives link payload
-   - Confirm crawl queue grows and `processCrawlQueue` stores products
-   - Validate that discovered products include image URLs in stored payload.
-2. Add lightweight tests for `crawl` and `discovery` endpoints (payload validation + auth guard).
-3. Keep crawler smoke-test artifacts fresh: run script on `public/cafe24-widget-demo.html` after each rollout and verify banner + chat open + recommendation response after dwell.
-4. Verify related-product image usage in recommendation payload for storefront products.
-5. Run visual smoke test for both supported install snippets:
-   - `public/cafe24-widget-demo.html` (`data-*` snippet)
-   - `public/slipai-init-demo.html` (`window.slipai("init", ...)` snippet)
+1. Connect the GitHub repository to Vercel and add the required Production/Preview environment variables from `docs/VERCEL_DEPLOYMENT.md`.
+2. Add Supabase-backed persistent storage before real advertiser traffic; Vercel memory fallback is only acceptable for demos.
+3. Add lightweight tests for `crawl`, `discovery`, and home recommendation triggers (payload validation + auth guard).
+4. Add browser smoke checks for:
+   - Home first visit banner (`public/slipai-home-demo.html`)
+   - Product detail dwell banner (`public/slipai-product-demo.html`)
+   - Init queue install (`public/slipai-init-demo.html`)
+5. Add an automated smoke check for the menu-free `/website` install ops screen.
+6. Verify crawler behavior on a real Cafe24 staging mall with multiple product detail URL formats.
+7. Add a small support checklist for confirming card click-through URLs and image extraction quality after install.
+8. Keep crawler smoke-test artifacts fresh after each rollout and verify banner + chat open + recommendation response after dwell.
 
 ## Priority 2
 1. Add observability counters in logs for crawl queue depth, error reasons, robots block ratio.

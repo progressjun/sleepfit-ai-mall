@@ -72,6 +72,9 @@ export const onsiteRecommendationRequestSchema = z.object({
   sessionId: z.string().min(8).max(120),
   page: onsitePageContextSchema,
   product: onsiteProductContextSchema,
+  trigger: z
+    .enum(["dwell_30s", "cart_click", "exit_intent", "manual", "home_first_visit", "home_returning_visit"])
+    .default("dwell_30s"),
   recentEvents: z.array(onsiteEventNameSchema).default([]),
 });
 

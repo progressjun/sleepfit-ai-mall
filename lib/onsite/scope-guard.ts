@@ -9,20 +9,15 @@ export interface OnsiteScopeDecision {
 }
 
 const blockedTerms: Array<RegExp> = [
-  // Development and technical topics are out of scope.
   /\b(code|coding|javascript|typescript|python|react|next|api|sdk|sql|backend|frontend|github|git|debug|bug|error)\b/i,
-
-  // Financial / macro topics.
   /\b(stock|coin|crypto|investment|invest|politics?|news|election|government|policy|currency|exchange rate|exchange-rate)\b/i,
-  /\uc8fc\uc2dd|\ucf54\uc778|\ud22c\uc790|\uc815\uce58|\ub274\uc2a4/i,
-
-  // Competitor / other-brand references (MVP examples).
-  /\ub9e5\ub3c4\ub0a0\ub4dc|coupang|gmarket|auction|11st|11\ubc88\uac00|other brand|competitor|other mall|\ub2e4\ub978 \ube0c\ub79c\ub4dc|\uacbd\uc7c1\uc0ac/i,
+  /주식|코인|투자|정치|뉴스|환율|부동산|개발|코딩|파이썬|자바스크립트/i,
+  /맥도날드|coupang|gmarket|auction|11st|11번가|other brand|competitor|other mall|다른 브랜드|경쟁사/i,
 ];
 
 const productIntents: Array<RegExp> = [
   /\b(product|item|price|shipping|delivery|exchange|return|refund|order|purchase|review|option|coupon|cart|size|color|material|fabric|fit|brand|category|checkout)\b/i,
-  /\uc0c1\ud488|\uc785\ub825|\uc0ac\uc774\uc988|\uac00\uaca9|\ubc30\uc1a1|\ub9ac\ubdf0|\uc635\uc158|\ud544\ub4dc|\uc804\ud654|\uc7a5\ubc14\uad6c\ub2c8|\uc0c9\uc0c1|\uc18c\uc7ac|\uc815\ubcf4|\ucf54\uc2a4|\uc544\ud3f4|\uad50\ud658|\ubc18\ud488|\ud658\ubd88/i,
+  /상품|사이즈|가격|배송|리뷰|후기|옵션|장바구니|색상|소재|교환|반품|환불|구매|결제|브랜드|코디|착용|핏|재질/i,
 ];
 
 function normalizeMessage(value: string) {
@@ -59,32 +54,32 @@ export function evaluateOnsiteChatScope(message: string, product?: { name?: stri
 }
 
 function createRefusalMessage(productName?: string, products: OnsiteProductSource[] = []) {
-  const fallbackName = products[0]?.name || "the current item";
+  const fallbackName = products[0]?.name || "현재 상품";
   const targetName = productName || fallbackName;
 
   return {
     message:
-      "I can only help with questions about the current store's products, options, reviews, shipping/return basics, and buying decisions. I cannot answer coding, finance, or unrelated topics.",
+      "저는 이 쇼핑몰의 상품, 옵션, 후기, 배송/교환/반품 안내, 구매 결정에 대해서만 도와드릴 수 있어요. 코딩, 금융, 일반 지식, 다른 브랜드 질문에는 답변하지 않습니다.",
     suggestedQuestions: [
-      `${targetName}: what should I consider before purchasing?`,
-      "How do I compare this item with similar options?",
-      "Show positive review highlights for this product.",
+      `${targetName} 구매 전에 무엇을 확인하면 좋을까요?`,
+      "비슷한 상품과 어떻게 비교하면 좋을까요?",
+      "좋은 후기 중심으로 보여주세요.",
     ],
     products: [
       {
         productNo: products[0]?.productNo == null ? null : String(products[0].productNo),
         name: products[0]?.name || fallbackName,
-        reason: "Reference product for scope-safe answers.",
+        reason: "이 쇼핑몰 범위 안에서 안내할 수 있는 기준 상품입니다.",
         priceText: products[0]?.priceText ?? null,
         imageUrl: products[0]?.imageUrl ?? null,
         url: products[0]?.url ?? null,
       },
     ],
     cta: {
-      label: "Open shop advice",
+      label: "상품 상담하기",
       action: "open_chat" as const,
     },
-    disclosure: "AI responses are limited to data from this installed store context only.",
+    disclosure: "SlipAI는 설치된 쇼핑몰의 상품과 후기 범위 안에서만 답변합니다.",
   };
 }
 

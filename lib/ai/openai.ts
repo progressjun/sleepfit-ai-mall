@@ -60,7 +60,7 @@ function resolveReasoningEffort(
   model: string,
 ): ReasoningEffort | undefined {
   if (!modelSupportsReasoning(model)) return undefined;
-  const normalizedEffort = effort === "minimal" ? "low" : effort;
+  const normalizedEffort = effort;
   const fallbackEffort = supportsNoReasoning(model) ? "none" : "minimal";
   const selectedEffort = normalizedEffort && reasoningEfforts.includes(normalizedEffort) ? normalizedEffort : fallbackEffort;
 
@@ -73,7 +73,7 @@ function resolveReasoningEffort(
 
 export function getOpenAIMaxOutputTokens() {
   const value = Number(process.env.OPENAI_MAX_OUTPUT_TOKENS || 360);
-  return Number.isFinite(value) && value > 0 ? Math.min(Math.floor(value), 1000) : 360;
+  return Number.isFinite(value) && value > 0 ? Math.min(Math.floor(value), 2000) : 360;
 }
 
 export function getOpenAIPromptCacheRetention() {

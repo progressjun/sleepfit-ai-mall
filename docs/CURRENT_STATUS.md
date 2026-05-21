@@ -2,6 +2,8 @@
 
 ## Current Snapshot
 - `widget/v1.js` endpoint is available and serves the SlipAI script.
+- Vercel deployment readiness is configured with `vercel.json`, `.vercelignore`, and `docs/VERCEL_DEPLOYMENT.md`.
+- GitHub remote is `progressjun/slipai`; Vercel Git Integration should import this repository and deploy from `master` after PR merge.
 - Core onsite APIs are implemented:
   - `/api/onsite/events`
   - `/api/onsite/recommendation`
@@ -13,6 +15,8 @@
 - Crawler loop now supports bounded background discovery from visited storefront URLs.
 - Crawl extraction now resolves relative asset URLs, captures in-page image fallbacks, and supports `product/<id>` style routes.
 - Review fallback for crawler ingestion avoids synthetic text injection; recommendations prioritize real extracted review evidence.
+- Widget now includes session frequency capping, cart-click comparison recommendations, and desktop exit-intent recommendations.
+- `/api/onsite/ops` exposes installation, event, recommendation, chat, blocked-scope, and crawl counters for the operator screen.
 
 ## Recent Outcomes
 - `npm run lint`: pass

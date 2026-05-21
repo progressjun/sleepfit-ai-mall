@@ -104,7 +104,9 @@ export async function POST(request: Request) {
 
   if (!scope.allowed) {
     const refusal = createScopedChatRefusal(knowledge);
-    const conversationId = await recordChatExchange(parsed.data, refusal.message);
+    const conversationId = await recordChatExchange(parsed.data, refusal.message, {
+      blockedByScope: true,
+    });
 
     return NextResponse.json(
       {
@@ -137,7 +139,7 @@ export async function POST(request: Request) {
         blockedTopics: ["coding", "general knowledge", "news", "politics", "investment", "other brands"],
       },
       policy:
-        "Use only anonymous session signals and supplied product/review context. Answer only about the installed brand, current mall products, reviews, options, and purchase decision support. Refuse coding, general knowledge, and other-brand questions. Never claim access to orders, membership, inventory, or private data.",
+        "Write shopper-facing copy in Korean. Use only anonymous session signals and supplied product/review context. Answer only about the installed brand, current mall products, reviews, options, and purchase decision support. Refuse coding, general knowledge, and other-brand questions. Never claim access to orders, membership, inventory, coupons, sales rank, or private data.",
     },
     schema: onsiteChatOutputSchema,
     mock: createMockChatReply({ message: parsed.data.message, product: knowledge }),

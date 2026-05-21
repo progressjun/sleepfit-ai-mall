@@ -5,6 +5,7 @@ import { Loader2Icon, WandSparklesIcon } from "lucide-react";
 import { SectionHeader } from "@/components/common/section-header";
 import { CodeSnippetCard } from "@/components/marketing-scripts/code-snippet-card";
 import { EventChecklist } from "@/components/marketing-scripts/event-checklist";
+import { OnsiteOpsPanel } from "@/components/marketing-scripts/onsite-ops-panel";
 import { ScriptStatusTable } from "@/components/marketing-scripts/script-status-table";
 import { TestEventPanel } from "@/components/marketing-scripts/test-event-panel";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,15 @@ export default function MarketingScriptsPage() {
     try {
       const result = await postJson<ScriptsAIOutput>("/api/ai/scripts", {
         selectedScripts: store.marketingScripts.map((script) => script.name),
-        requiredEvents: ["page_view", "view_item", "add_to_cart", "begin_checkout", "purchase", "sign_up", "generate_lead"],
+        requiredEvents: [
+          "page_view",
+          "dwell_30s",
+          "scroll",
+          "cart_click",
+          "chat_open",
+          "chat_message",
+          "banner_cta_click",
+        ],
         commerceGoal: "광고 전환 측정과 리마케팅",
       });
       store.saveScriptGuide(result.data);
@@ -70,6 +79,7 @@ export default function MarketingScriptsPage() {
           </Button>
         }
       />
+      <OnsiteOpsPanel />
       <ScriptStatusTable />
       <div className="grid gap-4 xl:grid-cols-2">
         <EventChecklist guide={store.latestScriptGuide} />

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SlipAI 홈 배너 데모</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #151515;
+        background: #f6f7f9;
+      }
+      main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 46px 20px 140px;
+      }
+      .hero {
+        padding: 28px;
+        border: 1px solid #dde2e8;
+        border-radius: 14px;
+        background: #fff;
+      }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 32px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+      .card {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+        border: 1px solid #e3e7ed;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+      }
+      .card img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        background: #f0f2f5;
+      }
+      .card strong,
+      .card span {
+        display: block;
+        padding: 0 12px;
+      }
+      .card strong {
+        padding-top: 12px;
+      }
+      .card span {
+        padding-bottom: 14px;
+        margin-top: 6px;
+        color: #667085;
+        font-size: 14px;
+      }
+      @media (max-width: 720px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>슬립AI 데모몰</h1>
+        <p>홈 진입 3초 후 SlipAI가 첫 방문/재방문 쇼핑가이드 배너를 띄우는지 확인하는 페이지입니다.</p>
+      </section>
+      <section class="grid" aria-label="추천 상품 목록">
+        <a class="card" href="/slipai-product-demo.html?product_no=1001">
+          <img src="/demo-product.svg" alt="라이트 코튼 데일리 티셔츠" />
+          <strong>라이트 코튼 데일리 티셔츠</strong>
+          <span>59,000원</span>
+        </a>
+        <a class="card" href="/slipai-product-demo.html?product_no=1002">
+          <img src="/demo-product.svg" alt="소프트 텐셀 라운지 세트" />
+          <strong>소프트 텐셀 라운지 세트</strong>
+          <span>89,000원</span>
+        </a>
+        <a class="card" href="/slipai-product-demo.html?product_no=1003">
+          <img src="/demo-product.svg" alt="에브리데이 베이직 니트" />
+          <strong>에브리데이 베이직 니트</strong>
+          <span>72,000원</span>
+        </a>
+      </section>
+    </main>
+
+    <script
+      async
+      src="/widget/v1.js?v=0.3.1-home-demo"
+      data-project-key="pk_demo"
+      data-mall-id="demo"
+      data-widget-token="demo_widget_token"
+      data-dwell-seconds="5"
+      data-debug="true"
+    ></script>
+  </body>
+</html>

@@ -7,6 +7,7 @@ import { onsiteRecommendationPrompt } from "@/lib/onsite/prompts";
 import { onsiteRecommendationRequestSchema } from "@/lib/onsite/schemas";
 import { applyOnsiteRateLimit, rateLimitHeaders } from "@/lib/onsite/rate-limit";
 import {
+  getFeaturedOnsiteProducts,
   getOnsiteKnowledge,
   getRelatedOnsiteProducts,
   recordRecommendationLog,
@@ -57,6 +58,16 @@ function sanitizeRecommendedProducts(
   return filtered.length > 0 ? filtered.slice(0, 3) : fallback.slice(0, 3);
 }
 
+function isHomeRecommendationTrigger(trigger: string) {
+  return trigger === "home_first_visit" || trigger === "home_returning_visit";
+}
+
+function homeGreeting(trigger: string) {
+  return trigger === "home_first_visit"
+    ? "첫 방문이시군요. 많이 살펴보는 상품부터 보여드릴게요."
+    : "다시 오셨네요. 어떤 부분이 고민되세요?";
+}
+
 export async function POST(request: Request) {
   const parsed = onsiteRecommendationRequestSchema.safeParse(await request.json().catch(() => null));
 
@@ -95,18 +106,37 @@ export async function POST(request: Request) {
     );
   }
 
+  const isHomeTrigger = isHomeRecommendationTrigger(parsed.data.trigger);
   const knowledge = await getOnsiteKnowledge({
     projectKey: parsed.data.projectKey,
     mallId: parsed.data.mallId,
     product: parsed.data.product,
   });
-  const relatedProducts = await getRelatedOnsiteProducts({
-    projectKey: parsed.data.projectKey,
-    mallId: parsed.data.mallId,
-    currentProduct: knowledge,
-  });
-  const fallbackRecommendation = createMockRecommendation(knowledge, relatedProducts);
-  const allowedCatalog = buildAllowedCatalog([knowledge, ...relatedProducts]);
+  const relatedProducts = isHomeTrigger
+    ? await getFeaturedOnsiteProducts({
+        projectKey: parsed.data.projectKey,
+        mallId: parsed.data.mallId,
+        limit: 3,
+      })
+    : await getRelatedOnsiteProducts({
+        projectKey: parsed.data.projectKey,
+        mallId: parsed.data.mallId,
+        currentProduct: knowledge,
+      });
+  const fallbackRecommendation = {
+    ...createMockRecommendation(knowledge, relatedProducts),
+    ...(isHomeTrigger
+      ? {
+          message: homeGreeting(parsed.data.trigger),
+          cta: {
+            label: "상품 추천 받기",
+            action: "open_chat" as const,
+          },
+          disclosure: "SlipAI가 이 쇼핑몰의 상품과 리뷰 정보를 바탕으로 추천합니다.",
+        }
+      : {}),
+  };
+  const allowedCatalog = buildAllowedCatalog(isHomeTrigger ? relatedProducts : [knowledge, ...relatedProducts]);
 
   const result = await generateStructuredOutput({
     taskName: "onsite_recommendation",
@@ -115,8 +145,9 @@ export async function POST(request: Request) {
       request: parsed.data,
       product: knowledge,
       relatedProducts,
+      trigger: parsed.data.trigger,
       reviewPolicy:
-        "Only use supplied product, related product candidates, and review evidence. Recommend similar products when possible. Do not invent discounts, inventory, medical claims, or personal data.",
+        "Answer in Korean. Only use supplied product, related product candidates, and review evidence. For home_first_visit or home_returning_visit, act as a friendly shopping guide and recommend featured products from the same mall. Do not claim best-selling or sales rank unless explicit order/sales data is supplied. Use phrases like 많이 살펴보는 상품, 리뷰 반응이 좋은 상품, 함께 비교하기 좋은 상품. For dwell_30s, prioritize positive review highlights and then similar products. For cart_click, focus on comparison confidence. For exit_intent, lead with review proof and a low-pressure chat CTA. Do not invent discounts, inventory, medical claims, private customer data, or cross-brand products.",
     },
     schema: onsiteRecommendationOutputSchema,
     mock: fallbackRecommendation,

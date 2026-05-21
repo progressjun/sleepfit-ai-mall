@@ -78,6 +78,8 @@ const metricCards = [
 
 const widgetScriptVersion = "0.3.1-ko-20260521";
 const configuredPublicOrigin = process.env.NEXT_PUBLIC_SLIPAI_PUBLIC_ORIGIN?.trim();
+const defaultProjectKey = process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_PROJECT_KEY?.trim() || "pk_slipai_test";
+const defaultMallId = process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_MALL_ID?.trim() || "slipai-test-kr";
 
 function formatDate(value?: string) {
   if (!value) return "-";
@@ -140,9 +142,9 @@ ${tokenLine}    dwellSeconds: 30
 }
 
 export default function WebsitePage() {
-  const [projectKey, setProjectKey] = useState("pk_demo");
-  const [mallId, setMallId] = useState("demo");
-  const [widgetToken, setWidgetToken] = useState("demo_widget_token");
+  const [projectKey, setProjectKey] = useState(defaultProjectKey);
+  const [mallId, setMallId] = useState(defaultMallId);
+  const [widgetToken, setWidgetToken] = useState("");
   const [origin, setOrigin] = useState(configuredPublicOrigin || "http://localhost:4010");
   const [summary, setSummary] = useState<OpsSummary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -224,9 +226,9 @@ export default function WebsitePage() {
                   <SignalIcon className="size-5" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-semibold tracking-tight text-slate-950">SlipAI 설치 관제</h1>
+                  <h1 className="text-2xl font-semibold tracking-tight text-slate-950">SlipAI Vercel 관제센터</h1>
                   <p className="mt-1 text-sm text-slate-500">
-                    이 화면은 메뉴 없이 원태그 스크립트 설치, 수집 이벤트, 적용 페이지 현황만 보여줍니다.
+                    Vercel 공개 URL은 광고주용 홈페이지가 아니라 설치 감지, 이벤트, 크롤링 상태를 보는 관제 화면입니다.
                   </p>
                 </div>
               </div>
@@ -245,9 +247,9 @@ export default function WebsitePage() {
             <CardContent className="space-y-4 p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-base font-semibold text-slate-950">광고주에게 줄 설치 스크립트</h2>
+                  <h2 className="text-base font-semibold text-slate-950">테스트 설치 스크립트</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    광고주는 이 코드만 공통 레이아웃의 `&lt;/body&gt;` 직전에 1회 설치하면 됩니다.
+                    테스트몰 공통 레이아웃의 `&lt;/body&gt;` 직전에 1회 설치하면 관제센터에 적용 현황이 표시됩니다.
                   </p>
                 </div>
                 <Button onClick={copySnippet} variant="outline">
@@ -270,6 +272,7 @@ export default function WebsitePage() {
                 <div className="space-y-2">
                   <Label htmlFor="widget-token">Widget token</Label>
                   <Input
+                    placeholder="운영에서 shared secret을 켠 경우에만 입력"
                     id="widget-token"
                     value={widgetToken}
                     onChange={(event) => setWidgetToken(event.target.value)}

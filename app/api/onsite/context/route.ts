@@ -79,6 +79,25 @@ const DOMAIN_PROFILES: DomainProfile[] = [
   },
   {
     pattern: termsPattern([
+      "\uC720\uC0B0\uADE0",
+      "\uD504\uB85C\uBC14\uC774\uC624\uD2F1\uC2A4",
+      "\uC720\uB798",
+      "\uC601\uC591\uC81C",
+      "\uBE44\uD0C0\uBBFC",
+      "\uD6A8\uC18C",
+      "\uD64D\uC0BC",
+      "\uCF5C\uB77C\uAC90",
+      "\uAC74\uAC15\uAE30\uB2A5\uC2DD\uD488",
+      "\uC12D\uCDE8",
+      "\uC131\uBD84",
+      "\uBCF4\uC7A5\uADE0\uC218",
+    ]),
+    focus: [ko("\uC131\uBD84"), ko("\uC12D\uCDE8 \uBC29\uBC95"), ko("\uD6C4\uAE30"), ko("\uAD6C\uC131")],
+    productQuestion: (name: string) => `${name} \uC131\uBD84\uACFC \uC12D\uCDE8 \uD3EC\uC778\uD2B8\uB294 \uC5B4\uB5A4\uAC00\uC694?`,
+    homeQuestion: ko("\uC131\uBD84\uACFC \uD6C4\uAE30 \uBC18\uC751 \uAE30\uC900\uC73C\uB85C \uAC74\uAC15\uC2DD\uD488\uC744 \uCD94\uCC9C\uD574\uC918."),
+  },
+  {
+    pattern: termsPattern([
       "\uC2DD\uD488",
       "\uAC04\uC2DD",
       "\uCEE4\uD53C",
@@ -148,15 +167,21 @@ function uniq(values: string[]) {
 }
 
 function chooseProfile(products: OnsiteProductSource[], pageTitle?: string) {
-  const haystack = [
+  const primaryHaystack = [
     pageTitle,
-    ...products.flatMap((product) => [product.name, product.reviewSummary, product.priceText]),
-    ...products.flatMap((product) => product.reviews.map((review) => review.content)),
+    ...products.flatMap((product) => [product.name, product.priceText]),
   ]
     .filter(Boolean)
     .join(" ");
+  const primaryMatch = DOMAIN_PROFILES.find((profile) => profile.pattern.test(primaryHaystack));
+  if (primaryMatch) return primaryMatch;
 
-  return DOMAIN_PROFILES.find((profile) => profile.pattern.test(haystack)) ?? DEFAULT_PROFILE;
+  const reviewHaystack = products
+    .flatMap((product) => product.reviews.map((review) => review.content))
+    .filter(Boolean)
+    .join(" ");
+
+  return DOMAIN_PROFILES.find((profile) => profile.pattern.test(reviewHaystack)) ?? DEFAULT_PROFILE;
 }
 
 function cleanMallName(pageTitle: string | undefined, productName: string | undefined, mallId: string) {

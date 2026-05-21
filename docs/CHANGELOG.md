@@ -12,6 +12,7 @@
 - Added server-driven onsite context copy so the chat greeting and input hint adapt to the installed mall's crawled products instead of using a fixed generic size prompt.
 - Repaired the Cafe24 widget demo page copy so local visual checks show a clean Korean product detail page.
 - Bumped the install snippet cache key after the onsite context/CORS fix so external test malls fetch the latest widget instead of a cached older script.
+- Added health-supplement context detection so probiotic and nutrition-product pages use guidance like ingredients, intake method, reviews, and product composition.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

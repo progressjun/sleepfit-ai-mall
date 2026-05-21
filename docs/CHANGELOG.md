@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### 2026-05-21
+- Created the long-running `SlipAI` branch for GitHub-backed version management.
+- Added `docs/SLIPAI_BRANCH_MAINTENANCE.md` with branch workflow, safe-change rules, recurring verification expectations, and deployment notes.
+- Added `scripts/slipai-health-check.mjs` to verify Korean widget copy, event ingestion, ops summary access, coding-question scope refusal, and optional full AI recommendation/chat smoke checks without printing secrets.
+- Registered the Codex maintenance automation `slipai-3-hour-maintenance-check`.
+- Updated current status and next-action docs for the Vercel public URL handoff and recurring maintenance loop.
+
 ### 2026-05-19
 - Added on-site crawler onboarding flow:
   - Added `POST /api/onsite/discovery` to collect discovered URLs from installed scripts.

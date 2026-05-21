@@ -58,7 +58,7 @@ const page = {
 const product = {
   pageType: "home",
   productNo: "health-001",
-  name: "SlipAI 테스트 상품",
+  name: "라이트 코튼 데일리 티셔츠",
   priceText: "29,000원",
   imageUrl: `${origin}/assets/slipai-health-product.jpg`,
   url: `${origin}/product/health-001`,
@@ -170,18 +170,43 @@ async function checkWidgetScript() {
   record("widget script status", response.ok, `${response.status} ${response.statusText}`);
   record("widget exposes namespace", text.includes("window.__SLIPAI"), "window.__SLIPAI 확인");
   record("widget Korean title", text.includes("SlipAI 상담사"), "상담사 타이틀 한글 확인");
-  record("widget Korean input", text.includes("상품, 사이즈, 후기 중 어떤 부분이 고민되나요?"), "입력 placeholder 한글 확인");
+  record("widget Korean input", text.includes("이 쇼핑몰에서 어떤 점이 고민되나요?"), "기본 입력 placeholder 한글 확인");
   record("widget Korean send button", text.includes(">전송<"), "전송 버튼 한글 확인");
   record("widget home trigger", text.includes("home_first_visit"), "홈 진입 추천 트리거 확인");
+  record("widget context endpoint", text.includes("/api/onsite/context"), "몰별 상담 문구 endpoint 확인");
   record(
     "widget no old English UI",
     !text.includes("SlipAI advisor") && !text.includes("Ask about product quality"),
     "구 영문 UI 문구 미검출",
   );
+  record(
+    "widget no generic size prompt",
+    !text.includes("상품, 사이즈, 후기 중 어떤 부분이 고민되나요?"),
+    "고정 범용 입력 문구 미검출",
+  );
   record("widget no mojibake", !hasMojibake(text), "위젯 스크립트 깨진 한글 미검출");
 }
 
-async function checkEventAndOps() {
+async function checkContextEventAndOps() {
+  const contextResult = await fetchJson("/api/onsite/context", {
+    projectKey,
+    mallId,
+    visitorId,
+    sessionId,
+    page,
+    product,
+  });
+  const context = contextResult.json?.data || {};
+  record("context API status", contextResult.response.ok, `${contextResult.response.status} ${contextResult.text.slice(0, 120)}`);
+  record("context Korean greeting", hasKorean(context.greeting), String(context.greeting || "").slice(0, 120));
+  record("context Korean placeholder", hasKorean(context.placeholder), String(context.placeholder || "").slice(0, 120));
+  record(
+    "context customized away from generic",
+    !String(context.placeholder || "").includes("상품, 사이즈"),
+    String(context.placeholder || "").slice(0, 120),
+  );
+  record("context no mojibake", !hasMojibake(JSON.stringify(context)), "컨텍스트 응답 깨진 한글 미검출");
+
   const payload = {
     projectKey,
     mallId,
@@ -268,7 +293,7 @@ async function checkAiRecommendations() {
 
 async function main() {
   await checkWidgetScript();
-  await checkEventAndOps();
+  await checkContextEventAndOps();
   await checkScopeGuardChat();
   await checkAiRecommendations();
 

@@ -9,6 +9,8 @@
 - Registered the Codex maintenance automation `slipai-3-hour-maintenance-check`.
 - Updated current status and next-action docs for the Vercel public URL handoff and recurring maintenance loop.
 - Tuned `/website` copy and defaults so the Vercel page reads as a SlipAI control center for the test deployment.
+- Added server-driven onsite context copy so the chat greeting and input hint adapt to the installed mall's crawled products instead of using a fixed generic size prompt.
+- Repaired the Cafe24 widget demo page copy so local visual checks show a clean Korean product detail page.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

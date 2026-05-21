@@ -375,12 +375,12 @@
     '<div class="msg"></div>' +
     '<div class="review-wrap"><div class="review-card"><div class="review-copy"></div><div class="review-meta"></div><div class="review-dots"></div></div></div>' +
     '<div class="product-strip"></div>' +
-    '<div class="actions"><button class="btn primary" type="button"></button><button class="btn ghost" type="button">어떤 부분이 고민되나요?</button></div>' +
+    '<div class="actions"><button class="btn primary" type="button"></button><button class="btn ghost" type="button">내게 맞는 상품 찾기</button></div>' +
     '<div class="tiny"></div>' +
     '</div></div>' +
     '<div class="chat" part="chat"><div class="head"><div class="title">SlipAI 상담사</div><button class="close" type="button" aria-label="상담창 닫기">×</button></div>' +
     '<div class="messages"></div>' +
-    '<form class="form"><input class="input" autocomplete="off" placeholder="상품, 사이즈, 후기 중 어떤 부분이 고민되나요?" /><button class="btn primary" type="submit">전송</button></form>' +
+    '<form class="form"><input class="input" autocomplete="off" placeholder="이 쇼핑몰에서 어떤 점이 고민되나요?" /><button class="btn primary" type="submit">전송</button></form>' +
     '</div>' +
     '<button class="launcher" type="button" aria-label="SlipAI 상담사 열기">SlipAI</button>' +
     "</div>";
@@ -419,6 +419,34 @@
   var recommendationLastKey = "slipai_reco_last_" + projectKey + "_" + mallId;
   var homeGreetingSessionKey = "slipai_home_greeting_shown_" + projectKey + "_" + mallId;
   var homeGreetingTimer = 0;
+  var advisorContext = {
+    greeting: "이 쇼핑몰의 상품과 후기 기준으로 도와드릴게요.",
+    placeholder: "이 쇼핑몰에서 어떤 점이 고민되나요?",
+    secondaryCta: "내게 맞는 상품 찾기",
+  };
+
+  function applyAdvisorContext(data) {
+    if (!data || typeof data !== "object") return;
+    if (typeof data.greeting === "string" && data.greeting.trim()) {
+      advisorContext.greeting = data.greeting.trim();
+    }
+    if (typeof data.placeholder === "string" && data.placeholder.trim()) {
+      advisorContext.placeholder = data.placeholder.trim();
+      input.setAttribute("placeholder", advisorContext.placeholder);
+    }
+    if (typeof data.secondaryCta === "string" && data.secondaryCta.trim()) {
+      advisorContext.secondaryCta = data.secondaryCta.trim();
+      ghostButton.textContent = advisorContext.secondaryCta;
+    }
+  }
+
+  function requestAdvisorContext() {
+    postJson("/api/onsite/context", payloadBase())
+      .then(function (result) {
+        if (result && result.data) applyAdvisorContext(result.data);
+      })
+      .catch(function () {});
+  }
 
   function addMessage(role, text) {
     var bubble = document.createElement("div");
@@ -715,7 +743,7 @@
     chat.classList.add("on");
     launcher.classList.add("hidden");
     if (!messages.childElementCount) {
-      addMessage("assistant", "어떤 부분이 고민되나요? 상품, 사이즈, 후기 기준으로 도와드릴게요.");
+      addMessage("assistant", advisorContext.greeting);
     }
     track("chat_open");
     window.setTimeout(function () {
@@ -756,6 +784,7 @@
         clearDwell();
         clearHomeGreeting();
         clearBanner();
+        requestAdvisorContext();
         track("page_view");
         sendDiscovery();
 
@@ -856,6 +885,7 @@
   );
 
   function init() {
+    requestAdvisorContext();
     track("page_view");
     sendDiscovery(true);
     currentRoute = getRouteKey();

@@ -90,6 +90,16 @@ export const onsiteChatRequestSchema = z.object({
   product: onsiteProductContextSchema.optional(),
 });
 
+export const onsiteContextRequestSchema = z.object({
+  projectKey: onsiteProjectKeySchema,
+  mallId: z.string().min(2).max(80),
+  widgetToken: z.string().max(512).optional(),
+  visitorId: z.string().min(8).max(120),
+  sessionId: z.string().min(8).max(120),
+  page: onsitePageContextSchema,
+  product: onsiteProductContextSchema.optional(),
+});
+
 export const cafe24OAuthStartSchema = z.object({
   mallId: z.string().min(2).max(80),
   projectKey: onsiteProjectKeySchema,
@@ -116,4 +126,5 @@ export type OnsiteEventRequest = z.infer<typeof onsiteEventRequestSchema>;
 export type OnsiteDiscoveryRequest = z.infer<typeof onsiteDiscoveryRequestSchema>;
 export type OnsiteRecommendationRequest = z.infer<typeof onsiteRecommendationRequestSchema>;
 export type OnsiteChatRequest = z.infer<typeof onsiteChatRequestSchema>;
+export type OnsiteContextRequest = z.infer<typeof onsiteContextRequestSchema>;
 export type Cafe24SyncRequest = z.infer<typeof cafe24SyncRequestSchema>;

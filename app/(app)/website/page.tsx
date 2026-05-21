@@ -76,7 +76,7 @@ const metricCards = [
   { key: "chatMessages", label: "상담 메시지", icon: MessageCircleIcon },
 ] as const;
 
-const widgetScriptVersion = "0.3.1-ko-20260521";
+const widgetScriptVersion = "0.3.2-context-cors-20260521";
 const configuredPublicOrigin = process.env.NEXT_PUBLIC_SLIPAI_PUBLIC_ORIGIN?.trim();
 const defaultProjectKey = process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_PROJECT_KEY?.trim() || "pk_slipai_test";
 const defaultMallId = process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_MALL_ID?.trim() || "slipai-test-kr";

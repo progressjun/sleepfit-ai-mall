@@ -83,7 +83,7 @@ After Vercel creates the public URL, install this once before `</body>` in the C
 </script>
 <script
   async
-  src="https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js?v=0.3.1-ko-20260521">
+  src="https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js?v=0.3.2-context-cors-20260521">
 </script>
 ```
 

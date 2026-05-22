@@ -21,10 +21,23 @@ export function OPTIONS(request: Request) {
 }
 
 function normalizeText(value: string | undefined | null) {
-  return value ? value.trim().toLowerCase() : "";
+  return value ? value.replace(/\s+/g, " ").trim().toLowerCase() : "";
 }
 
-function buildAllowedCatalog(products: Array<{ productNo?: string | number | null; name?: string | null }>) {
+function normalizeIdentity(value: string | undefined | null) {
+  return normalizeText(value).replace(/[\s()[\]{}<>,./\\|_-]+/g, "");
+}
+
+function buildAllowedCatalog(
+  products: Array<{
+    productNo?: string | number | null;
+    name?: string | null;
+    reviewSummary?: string | null;
+    priceText?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  }>,
+) {
   const allowedNo = new Set<string>();
   const allowedName = new Set<string>();
 
@@ -37,7 +50,7 @@ function buildAllowedCatalog(products: Array<{ productNo?: string | number | nul
     }
   }
 
-  return { allowedNo, allowedName };
+  return { allowedNo, allowedName, products };
 }
 
 function isAllowedProduct(
@@ -49,13 +62,95 @@ function isAllowedProduct(
   return false;
 }
 
+function sameProductIdentity(
+  product: { productNo?: string | null; name?: string | null },
+  current: { productNo?: string | number | null; name?: string | null },
+) {
+  const productNo = product.productNo == null ? "" : String(product.productNo).trim();
+  const currentNo = current.productNo == null ? "" : String(current.productNo).trim();
+  if (productNo && currentNo && productNo === currentNo) return true;
+
+  const productName = normalizeIdentity(product.name);
+  const currentName = normalizeIdentity(current.name);
+  return Boolean(productName && currentName && productName === currentName);
+}
+
+function productKey(product: {
+  productNo?: string | number | null;
+  name?: string | null;
+  url?: string | null;
+}) {
+  const productNo = product.productNo == null ? "" : String(product.productNo).trim();
+  if (productNo) return `no:${productNo}`;
+
+  const url = product.url ? normalizeText(product.url) : "";
+  if (url) return `url:${url}`;
+
+  const name = normalizeIdentity(product.name);
+  return name ? `name:${name}` : "";
+}
+
+function enrichProduct<
+  T extends {
+    productNo?: string | null;
+    name?: string | null;
+    reason?: string | null;
+    priceText?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  },
+>(product: T, allowed: ReturnType<typeof buildAllowedCatalog>) {
+  const match = allowed.products.find((candidate) => {
+    const candidateNo = candidate.productNo == null ? "" : String(candidate.productNo).trim();
+    const productNo = product.productNo == null ? "" : String(product.productNo).trim();
+    if (candidateNo && productNo && candidateNo === productNo) return true;
+    return Boolean(candidate.name && product.name && normalizeIdentity(candidate.name) === normalizeIdentity(product.name));
+  });
+
+  return {
+    ...product,
+    name: product.name || match?.name || "추천 상품",
+    reason: product.reason || match?.reviewSummary || "리뷰와 상품 정보를 기준으로 함께 비교하기 좋은 상품입니다.",
+    priceText: product.priceText ?? match?.priceText ?? null,
+    imageUrl: product.imageUrl ?? match?.imageUrl ?? null,
+    url: product.url ?? match?.url ?? null,
+  };
+}
+
 function sanitizeRecommendedProducts(
-  products: Array<{ productNo?: string | null; name?: string | null }>,
+  products: Array<{
+    productNo?: string | null;
+    name?: string | null;
+    reason?: string | null;
+    priceText?: string | null;
+    imageUrl?: string | null;
+    url?: string | null;
+  }>,
   allowed: ReturnType<typeof buildAllowedCatalog>,
   fallback: typeof products,
+  currentProduct: { productNo?: string | number | null; name?: string | null },
 ) {
-  const filtered = products.filter((product) => isAllowedProduct(product, allowed));
-  return filtered.length > 0 ? filtered.slice(0, 3) : fallback.slice(0, 3);
+  const seen = new Set<string>();
+
+  const candidates = [...products, ...fallback]
+    .map((product) => enrichProduct(product, allowed))
+    .filter((product) => isAllowedProduct(product, allowed))
+    .filter((product) => !sameProductIdentity(product, currentProduct))
+    .filter((product) => {
+      const key = productKey(product);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => {
+      const imageScore = Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl));
+      if (imageScore !== 0) return imageScore;
+      const urlScore = Number(Boolean(b.url)) - Number(Boolean(a.url));
+      if (urlScore !== 0) return urlScore;
+      return normalizeText(a.name).localeCompare(normalizeText(b.name), "ko");
+    });
+
+  return candidates.slice(0, 3);
 }
 
 function isHomeRecommendationTrigger(trigger: string) {
@@ -147,7 +242,7 @@ export async function POST(request: Request) {
       relatedProducts,
       trigger: parsed.data.trigger,
       reviewPolicy:
-        "Answer in Korean. Only use supplied product, related product candidates, and review evidence. For home_first_visit or home_returning_visit, act as a friendly shopping guide and recommend featured products from the same mall. Do not claim best-selling or sales rank unless explicit order/sales data is supplied. Use phrases like 많이 살펴보는 상품, 리뷰 반응이 좋은 상품, 함께 비교하기 좋은 상품. For dwell_30s, prioritize positive review highlights and then similar products. For cart_click, focus on comparison confidence. For exit_intent, lead with review proof and a low-pressure chat CTA. Do not invent discounts, inventory, medical claims, private customer data, or cross-brand products.",
+        "Answer in Korean. Only use supplied product, related product candidates, and review evidence. For home_first_visit or home_returning_visit, act as a friendly shopping guide and recommend featured products from the same mall. Do not claim best-selling or sales rank unless explicit order/sales data is supplied. Use phrases like 많이 살펴보는 상품, 리뷰 반응이 좋은 상품, 함께 비교하기 좋은 상품. For dwell_30s, prioritize positive review highlights and then similar products. For cart_click, focus on comparison confidence. For exit_intent, lead with review proof and a low-pressure chat CTA. Do not invent discounts, inventory, medical claims, private customer data, or cross-brand products. Do not recommend the current product as an alternative to itself.",
     },
     schema: onsiteRecommendationOutputSchema,
     mock: fallbackRecommendation,
@@ -156,12 +251,12 @@ export async function POST(request: Request) {
     reasoningEffort: process.env.ONSITE_OPENAI_REASONING_EFFORT,
   });
 
-  const currentProductNo = knowledge.productNo == null ? "" : String(knowledge.productNo);
   const sanitizedProducts = sanitizeRecommendedProducts(
     result.data.products,
     allowedCatalog,
     fallbackRecommendation.products,
-  ).filter((product) => !currentProductNo || product.productNo !== currentProductNo);
+    knowledge,
+  );
 
   const normalizedResult = {
     ...result,
@@ -171,7 +266,14 @@ export async function POST(request: Request) {
         result.data.reviewHighlights.length > 0
           ? result.data.reviewHighlights.slice(0, 6)
           : fallbackRecommendation.reviewHighlights,
-      products: sanitizedProducts.length > 0 ? sanitizedProducts : fallbackRecommendation.products,
+      products: sanitizedProducts,
+      cta:
+        sanitizedProducts.length > 0
+          ? result.data.cta
+          : {
+              label: "후기 더보기 및 상담하기",
+              action: "open_chat" as const,
+            },
     },
   };
 

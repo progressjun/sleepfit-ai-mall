@@ -22,6 +22,12 @@
 - Expanded onsite event validation and widget tracking for `banner_resolved`, `impression`, `click`, `close`, and conversion-style manual events.
 - Added `/onsite.js` one-line install compatibility plus `/api/widget/resolve`, `/api/chat`, and `/api/events` compatibility endpoints for generic onsite banner/advisor integrations.
 - Added `data-site-id` support and `window.PMOnsite.track/open/close/getState` compatibility while keeping the existing SlipAI init queue and server-only OpenAI API flow.
+- Hardened onsite recommendation quality: remove current-product duplicates, deduplicate product cards, prefer products with real images/URLs, hide cards when no valid alternative exists, and add image placeholders so broken images do not collapse the UI.
+- Repaired onsite recommendation fallback copy and added static mojibake checks for core onsite files.
+- Rebuilt onsite fallback recommendation copy with clean Korean, added generated fallback thumbnails for demo/mock recommendations, and added widget-side guards for duplicate/current-product cards.
+- Improved product-detail dwell recommendation reliability with a safety timer and added debug-only state attributes for local QA.
+- Raised demo-only frequency caps/cooldowns so repeated visual QA does not hide the recommendation banner after the normal shopper frequency cap is reached.
+- Expanded the health check to assert product-card image fallback and client-side current-product dedupe guards.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

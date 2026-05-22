@@ -65,13 +65,13 @@
       .btnBasket {
         background: #e9edf2;
       }
-      .spacer {
-        height: 900px;
-      }
       .note {
         margin-top: 14px;
         font-size: 14px;
         color: #5f6670;
+      }
+      .spacer {
+        height: 900px;
       }
       @media (max-width: 720px) {
         .product {
@@ -86,18 +86,18 @@
   <body>
     <main>
       <section class="product xans-product-detail" data-product-no="1001">
-        <img class="product-image" src="/demo-product.svg" alt="데모 상품 이미지" />
+        <img class="product-image" src="/demo-product.svg" alt="라이트 코튼 데일리 티셔츠" />
         <div>
           <p>SlipAI 데모몰</p>
           <h1>라이트 코튼 데일리 티셔츠</h1>
           <div id="span_product_price_text" class="price">59,000원</div>
           <p class="copy">
-            상품 상세페이지에서 설치 스크립트가 정상 동작하는지 확인하는 데모입니다. 페이지에 잠시 머무르면
-            SlipAI가 좋은 후기와 함께 비교하기 좋은 추천 상품을 보여줍니다.
+            카페24 스타일 상품 상세페이지에서 원태그 설치가 정상 동작하는지 확인하는 데모입니다. 5초 체류 후
+            후기 하이라이트와 추천 배너가 표시됩니다.
           </p>
           <button class="btnBuy" type="button">구매하기</button>
           <button class="btnBasket" type="button">장바구니 담기</button>
-          <p class="note">버튼 클릭은 장바구니 이벤트와 추천 배너 테스트에 사용합니다.</p>
+          <p class="note">장바구니 버튼 클릭은 장바구니 이벤트와 비교 추천 배너 테스트에 사용합니다.</p>
         </div>
       </section>
       <div class="spacer"></div>
@@ -105,13 +105,16 @@
 
     <script
       async
-      src="/widget/v1.js?v=demo-slipai"
+      src="/onsite.js?v=0.3.5"
+      data-site-id="demo"
       data-project-key="pk_demo"
       data-mall-id="demo"
       data-widget-token="demo_widget_token"
       data-dwell-seconds="5"
+      data-session-frequency-cap="50"
+      data-recommendation-cooldown-seconds="0"
       data-debug="true"
-      data-diagnostic="true"
-    ></script>
+      data-diagnostic="true">
+    </script>
   </body>
 </html>

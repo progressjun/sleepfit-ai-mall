@@ -188,6 +188,16 @@ async function checkWidgetScript() {
     !text.includes("상품, 사이즈, 후기 중 어떤 부분이 고민되나요?"),
     "고정 범용 입력 문구 미검출",
   );
+  record(
+    "widget product media fallback",
+    text.includes(".product-media") && text.includes("product-placeholder") && text.includes("img.onerror"),
+    "상품 이미지 실패 시 카드가 무너지지 않는 placeholder 확인",
+  );
+  record(
+    "widget current-product dedupe guard",
+    text.includes("compactProductName") && text.includes("current.name") && text.includes("candidate.name"),
+    "현재 상품이 추천 카드에 중복 노출되지 않도록 클라이언트 방어 확인",
+  );
   record("widget no mojibake", !hasMojibake(text), "위젯 스크립트 깨진 한글 미검출");
 }
 
@@ -338,7 +348,27 @@ async function checkAiRecommendations() {
   record("chat product cards", !assertProductCards(chat.json?.data?.products), assertProductCards(chat.json?.data?.products));
 }
 
+function checkStaticOnsiteCopy() {
+  const mojibakePattern = /[\uFFFD\uF900-\uFAFF\u4E00-\u9FFF]|\?[\u3131-\uD7A3]/;
+  const files = [
+    "lib/onsite/mock.ts",
+    "app/api/onsite/recommendation/route.ts",
+    "app/api/onsite/chat/route.ts",
+    "lib/onsite/widget-script.ts",
+    "public/slipai-product-demo.html",
+    "public/slipai-home-demo.html",
+    "public/cafe24-widget-demo.html",
+  ];
+
+  for (const file of files) {
+    const fullPath = path.join(rootDir, file);
+    const text = fs.existsSync(fullPath) ? fs.readFileSync(fullPath, "utf8") : "";
+    record(`static copy no mojibake: ${file}`, !mojibakePattern.test(text), "온사이트 핵심 문구 깨짐 여부 확인");
+  }
+}
+
 async function main() {
+  checkStaticOnsiteCopy();
   await checkWidgetScript();
   await checkContextEventAndOps();
   await checkScopeGuardChat();

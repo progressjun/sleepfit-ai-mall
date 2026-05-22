@@ -71,8 +71,8 @@
   <body>
     <main>
       <section class="hero">
-        <h1>슬립AI 데모몰</h1>
-        <p>홈 진입 3초 후 SlipAI가 첫 방문/재방문 쇼핑가이드 배너를 띄우는지 확인하는 페이지입니다.</p>
+        <h1>SlipAI 데모몰</h1>
+        <p>홈 진입 3초 뒤 SlipAI가 첫 방문/재방문 쇼핑가이드 배너를 띄우는지 확인하는 페이지입니다.</p>
       </section>
       <section class="grid" aria-label="추천 상품 목록">
         <a class="card" href="/slipai-product-demo.html?product_no=1001">
@@ -81,13 +81,13 @@
           <span>59,000원</span>
         </a>
         <a class="card" href="/slipai-product-demo.html?product_no=1002">
-          <img src="/demo-product.svg" alt="소프트 텐셀 라운지 세트" />
-          <strong>소프트 텐셀 라운지 세트</strong>
+          <img src="/demo-product.svg" alt="소프트 저지 라운지 세트" />
+          <strong>소프트 저지 라운지 세트</strong>
           <span>89,000원</span>
         </a>
         <a class="card" href="/slipai-product-demo.html?product_no=1003">
-          <img src="/demo-product.svg" alt="에브리데이 베이직 니트" />
-          <strong>에브리데이 베이직 니트</strong>
+          <img src="/demo-product.svg" alt="에브리데이 베이지 니트" />
+          <strong>에브리데이 베이지 니트</strong>
           <span>72,000원</span>
         </a>
       </section>
@@ -95,12 +95,15 @@
 
     <script
       async
-      src="/widget/v1.js?v=0.3.1-home-demo"
+      src="/onsite.js?v=0.3.5"
+      data-site-id="demo"
       data-project-key="pk_demo"
       data-mall-id="demo"
       data-widget-token="demo_widget_token"
       data-dwell-seconds="5"
-      data-debug="true"
-    ></script>
+      data-session-frequency-cap="50"
+      data-recommendation-cooldown-seconds="0"
+      data-debug="true">
+    </script>
   </body>
 </html>

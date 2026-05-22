@@ -24,6 +24,9 @@
 - Review fallback for crawler ingestion avoids synthetic text injection; recommendations prioritize real extracted review evidence.
 - Widget now includes session frequency capping, cart-click comparison recommendations, and desktop exit-intent recommendations.
 - Widget event tracking now includes server-resolved banner, impression, click, close, and manual conversion-style events in addition to the original SlipAI behavior events.
+- Recommendation responses now remove current-product duplicates, deduplicate product cards, prefer real image/URL candidates, and let the widget show a stable placeholder when an image fails.
+- Demo/mock recommendation fallbacks now return readable Korean and generated thumbnail images, so fallback cards do not look blank while real crawled product images remain preferred in production.
+- Product-detail dwell recommendations now include a safety timer, and debug-only widget attributes expose timer/request/skip state for local QA.
 - `/api/onsite/ops` exposes installation, event, recommendation, chat, blocked-scope, and crawl counters for the operator screen.
 - `/website` now shows the stable install snippet without a pinned version query so future Vercel releases can auto-reflect on installed storefronts.
 - Advertiser-facing one-line installs can use `/onsite.js` with `data-site-id`; advanced installs can still use `window.slipai("init", ...)` and `/widget/v1.js`.
@@ -32,7 +35,9 @@
 - `npm run lint`: pass
 - `npm run typecheck`: pass
 - `npm run build` (Next 16.2.6): pass
+- `node scripts/slipai-health-check.mjs`: pass
 - Manual behavior checks: widget event tracking and UI render still operational after crawler wiring.
+- Browser QA on `public/slipai-product-demo.html`: pass for no current-product duplicates, 3 visible recommendation cards, image media present, and no mojibake after demo frequency cap was raised.
 - GitHub Actions verify job passed on the deployment-readiness branch before `SlipAI` branch creation.
 
 ## Next Checks

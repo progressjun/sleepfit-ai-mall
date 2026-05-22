@@ -6,7 +6,7 @@
     <meta property="og:title" content="라이트 코튼 데일리 티셔츠" />
     <meta property="og:image" content="/demo-product.svg" />
     <meta property="product:price:amount" content="59000" />
-    <title>라이트 코튼 데일리 티셔츠</title>
+    <title>라이트 코튼 데일리 티셔츠 | SlipAI 데모몰</title>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -110,12 +110,12 @@
       <section class="product xans-product-detail" data-product-no="1001">
         <img class="product-image" src="/demo-product.svg" alt="라이트 코튼 데일리 티셔츠" />
         <div>
-          <p>슬립AI 데모몰</p>
+          <p>SlipAI 데모몰</p>
           <h1>라이트 코튼 데일리 티셔츠</h1>
           <div id="span_product_price_text" class="price">59,000원</div>
           <p class="copy">
-            상품 상세페이지에 설치한 스크립트가 5초 체류 후 리뷰 하이라이트와 유사 상품을 보여주는지 확인하는
-            데모입니다.
+            상품 상세페이지에서 설치 스크립트가 정상 동작하는지 확인하는 데모입니다. 잠시 머무르면 SlipAI가 후기
+            하이라이트와 함께 비교하기 좋은 상품을 보여줍니다.
           </p>
           <button class="btnBuy" type="button">구매하기</button>
           <button class="btnBasket" type="button">장바구니 담기</button>
@@ -126,12 +126,15 @@
 
     <script
       async
-      src="/widget/v1.js?v=0.3.1-product-demo"
+      src="/onsite.js?v=0.3.5"
+      data-site-id="demo"
       data-project-key="pk_demo"
       data-mall-id="demo"
       data-widget-token="demo_widget_token"
       data-dwell-seconds="5"
-      data-debug="true"
-    ></script>
+      data-session-frequency-cap="50"
+      data-recommendation-cooldown-seconds="0"
+      data-debug="true">
+    </script>
   </body>
 </html>

@@ -4,8 +4,8 @@ import { generateStructuredOutput } from "@/lib/ai/service";
 import { corsHeaders, optionsResponse } from "@/lib/onsite/cors";
 import { createMockRecommendation } from "@/lib/onsite/mock";
 import { onsiteRecommendationPrompt } from "@/lib/onsite/prompts";
-import { onsiteRecommendationRequestSchema } from "@/lib/onsite/schemas";
 import { applyOnsiteRateLimit, rateLimitHeaders } from "@/lib/onsite/rate-limit";
+import { onsiteRecommendationRequestSchema } from "@/lib/onsite/schemas";
 import {
   getFeaturedOnsiteProducts,
   getOnsiteKnowledge,

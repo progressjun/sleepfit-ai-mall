@@ -31,6 +31,13 @@ export const onsitePageContextSchema = z.object({
 
 export const onsiteEventNameSchema = z.enum([
   "page_view",
+  "banner_resolved",
+  "impression",
+  "click",
+  "close",
+  "conversion",
+  "purchase",
+  "signup",
   "dwell_30s",
   "scroll",
   "cart_click",

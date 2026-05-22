@@ -14,6 +14,12 @@
 - Bumped the install snippet cache key after the onsite context/CORS fix so external test malls fetch the latest widget instead of a cached older script.
 - Added health-supplement context detection so probiotic and nutrition-product pages use guidance like ingredients, intake method, reviews, and product composition.
 - Added a chat product-card fallback so "not this product" recommendation questions still show same-mall alternatives when the AI returns only the current item.
+- Switched production install guidance to the stable `/widget/v1.js` URL without a pinned version query so Vercel releases can auto-reflect on installed storefronts.
+- Shortened production widget cache headers and added a stable-channel response header for faster rollout pickup.
+- Repaired mojibake on the `/website` SlipAI control center and clarified the automatic update flow in Korean.
+- Added `docs/ONSITE_ONE_TAG_ARCHITECTURE.md` to lock the product direction as a loader SDK + server decision API + event tracking system.
+- Cleaned onsite recommendation/chat fallback Korean copy so AI fallback responses stay readable.
+- Expanded onsite event validation and widget tracking for `banner_resolved`, `impression`, `click`, `close`, and conversion-style manual events.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

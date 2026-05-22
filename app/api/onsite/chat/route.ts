@@ -4,10 +4,10 @@ import { generateStructuredOutput } from "@/lib/ai/service";
 import { corsHeaders, optionsResponse } from "@/lib/onsite/cors";
 import { createMockChatReply } from "@/lib/onsite/mock";
 import { onsiteChatPrompt } from "@/lib/onsite/prompts";
+import { applyOnsiteRateLimit, rateLimitHeaders } from "@/lib/onsite/rate-limit";
 import { onsiteChatRequestSchema } from "@/lib/onsite/schemas";
 import { createScopedChatRefusal, evaluateOnsiteChatScope } from "@/lib/onsite/scope-guard";
 import { getOnsiteKnowledge, getRelatedOnsiteProducts, recordChatExchange, validateOnsiteWidgetAuth } from "@/lib/onsite/storage";
-import { applyOnsiteRateLimit, rateLimitHeaders } from "@/lib/onsite/rate-limit";
 
 export const runtime = "nodejs";
 

@@ -20,10 +20,10 @@ export interface OnsiteProductSource {
 const fallbackReviews: OnsiteReviewSource[] = [
   { rating: 5, content: "실제로 받아보니 화면보다 색감이 더 깔끔하고 소재가 탄탄하다는 후기가 많아요." },
   { rating: 5, content: "가격 대비 만족도가 좋고 배송이 빨랐다는 반응이 반복해서 보입니다." },
-  { rating: 4, content: "상세 설명과 거의 같고 데일리로 쓰기 좋다는 의견이 있어요." },
+  { rating: 4, content: "상세 설명과 실제 느낌이 거의 같아서 데일리로 쓰기 좋다는 의견이 있어요." },
   { rating: 5, content: "후기를 보고 구매 결정을 하기 쉬웠다는 반응이 많습니다." },
   { rating: 4, content: "디자인이 무난하고 포장 상태가 깔끔했다는 평가가 있습니다." },
-  { rating: 5, content: "상품 설명과 실제 수령 경험이 잘 맞았다는 후기가 있어요." },
+  { rating: 5, content: "상품 설명과 실제 사용 경험이 잘 맞았다는 후기가 있어요." },
 ];
 
 export function createFallbackProduct(product?: OnsiteProductContext): OnsiteProductSource {
@@ -89,12 +89,12 @@ export function createMockRecommendation(
   const reasons = [
     "리뷰에서 언급된 기대감과 잘 맞는 비교 상품입니다.",
     "이 상품을 보는 고객이 함께 살펴보기 좋은 옵션입니다.",
-    "비슷한 리뷰 반응을 기준으로 대안으로 비교하기 좋습니다.",
+    "비슷한 리뷰 반응을 기준으로 함께 비교하기 좋습니다.",
   ];
 
   return {
     surface: "banner",
-    message: `${target.name}을 살펴보고 계시네요. 후기가 좋은 비교 상품도 함께 보여드릴게요.`,
+    message: `${target.name}을 살펴보고 계시군요. 후기가 좋은 비교 상품도 함께 보여드릴게요.`,
     reviewHighlights: highlights.length > 0 ? highlights : fallbackReviews.map((review) => review.content),
     products: related.slice(0, 3).map((item, index) => ({
       productNo: item.productNo == null ? null : String(item.productNo),
@@ -124,8 +124,8 @@ export function createMockChatReply({
   return {
     message:
       message.length > 0
-        ? `${target.name} 기준으로는 소재, 옵션, 최근 후기에서 반복되는 장단점을 같이 확인해보고 결정하는 걸 추천드려요.`
-        : "상품, 사이즈, 옵션, 후기 중 어떤 부분이 고민되는지 말씀해주세요.",
+        ? `${target.name} 기준으로 소재, 옵션, 최근 후기에서 반복되는 장단점을 같이 확인해보고 결정하는 것을 추천드려요.`
+        : "상품, 옵션, 후기 중 어떤 부분이 고민되는지 말씀해 주세요.",
     suggestedQuestions: [
       "데일리로 쓰기 좋은 옵션은 뭐예요?",
       "비슷한 상품과 어떻게 비교하면 좋을까요?",

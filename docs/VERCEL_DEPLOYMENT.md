@@ -7,6 +7,7 @@ GitHub repository
   -> Vercel Git Integration
   -> Production URL such as https://YOUR_SLIPAI_PROJECT.vercel.app
   -> Storefront installs /widget/v1.js from that URL
+  -> Future SlipAI releases are reflected automatically from the same stable script URL
 ```
 
 Local tunnels such as Cloudflare quick tunnel, localtunnel, or ngrok are only for short smoke tests.
@@ -81,20 +82,22 @@ After Vercel creates the public URL, install this once before `</body>` in the C
     dwellSeconds: 30
   });
 </script>
-<script
-  async
-  src="https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js?v=0.3.2-context-cors-20260521">
-</script>
+<script async src="https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js"></script>
 ```
 
 If no `ONSITE_WIDGET_SHARED_SECRET` is set, omit `token`, but production should use a secret and strict
 `ONSITE_WIDGET_ALLOWED_ORIGINS`.
 
+Do not pin the script with a version query string in production storefront installs. The stable
+`/widget/v1.js` URL lets SlipAI feature releases ship from GitHub -> Vercel without asking each
+brand to edit Cafe24 again. The widget response uses a short production cache so updates are picked
+up quickly while still protecting the server from excessive script fetches.
+
 ## Smoke Check
 
 1. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/website`.
 2. Confirm the copied install snippet uses the Vercel URL, not `localhost` or a tunnel URL.
-3. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js?v=healthcheck`.
+3. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js`.
 4. Confirm the response contains `SlipAI 상담사`.
 5. Install the snippet on a test storefront.
 6. In the browser console, confirm `window.__SLIPAI.getState()` exists.

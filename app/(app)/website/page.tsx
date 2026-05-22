@@ -71,12 +71,11 @@ interface OpsResponse {
 
 const metricCards = [
   { key: "events", label: "수집 이벤트", icon: ActivityIcon },
-  { key: "recommendations", label: "AI 추천 호출", icon: BotIcon },
+  { key: "recommendations", label: "AI 추천 노출", icon: BotIcon },
   { key: "bannerCtaClicks", label: "배너 클릭", icon: MousePointerClickIcon },
   { key: "chatMessages", label: "상담 메시지", icon: MessageCircleIcon },
 ] as const;
 
-const widgetScriptVersion = "0.3.2-context-cors-20260521";
 const configuredPublicOrigin = process.env.NEXT_PUBLIC_SLIPAI_PUBLIC_ORIGIN?.trim();
 const defaultProjectKey = process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_PROJECT_KEY?.trim() || "pk_slipai_test";
 const defaultMallId = process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_MALL_ID?.trim() || "slipai-test-kr";
@@ -132,13 +131,14 @@ function buildInstallSnippet({
     function () {
       (window.slipai.q = window.slipai.q || []).push(arguments);
     };
+
   window.slipai("init", {
     projectKey: "${projectKey}",
     mallId: "${mallId}",
 ${tokenLine}    dwellSeconds: 30
   });
 </script>
-<script async src="${origin}/widget/v1.js?v=${widgetScriptVersion}"></script>`;
+<script async src="${origin}/widget/v1.js"></script>`;
 }
 
 export default function WebsitePage() {
@@ -226,9 +226,9 @@ export default function WebsitePage() {
                   <SignalIcon className="size-5" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-semibold tracking-tight text-slate-950">SlipAI Vercel 관제센터</h1>
+                  <h1 className="text-2xl font-semibold tracking-tight text-slate-950">SlipAI 관제센터</h1>
                   <p className="mt-1 text-sm text-slate-500">
-                    Vercel 공개 URL은 광고주용 홈페이지가 아니라 설치 감지, 이벤트, 크롤링 상태를 보는 관제 화면입니다.
+                    설치 스크립트, 적용된 자사몰, 수집 이벤트, 크롤링 상태를 한 화면에서 확인합니다.
                   </p>
                 </div>
               </div>
@@ -247,9 +247,9 @@ export default function WebsitePage() {
             <CardContent className="space-y-4 p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-base font-semibold text-slate-950">테스트 설치 스크립트</h2>
+                  <h2 className="text-base font-semibold text-slate-950">자동 업데이트 설치 스크립트</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    테스트몰 공통 레이아웃의 `&lt;/body&gt;` 직전에 1회 설치하면 관제센터에 적용 현황이 표시됩니다.
+                    자사몰 공통 레이아웃의 <code className="rounded bg-slate-100 px-1">&lt;/body&gt;</code> 직전에 1회만 설치합니다. 이후 SlipAI 서버가 배포되면 같은 스크립트 주소로 최신 안정 버전이 자동 반영됩니다.
                   </p>
                 </div>
                 <Button onClick={copySnippet} variant="outline">
@@ -286,17 +286,17 @@ export default function WebsitePage() {
             <CardContent className="space-y-4 p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="text-base font-semibold text-slate-950">서버 저장 범위</h2>
-                  <p className="mt-1 text-sm text-slate-500">스크립트 운영에 필요한 내용만 저장합니다.</p>
+                  <h2 className="text-base font-semibold text-slate-950">업데이트 반영 구조</h2>
+                  <p className="mt-1 text-sm text-slate-500">브랜드사는 스크립트를 다시 바꾸지 않아도 됩니다.</p>
                 </div>
                 <ServerIcon className="size-5 text-slate-400" />
               </div>
               <div className="space-y-3 text-sm">
                 {[
-                  "설치 프로젝트 키, 몰 ID, 허용 도메인",
-                  "page_view, discovery, dwell, click, chat 이벤트",
-                  "크롤링으로 확인된 상품명, 이미지, URL, 후기 요약",
-                  "AI 추천/상담 응답 로그와 범위 차단 여부",
+                  "브랜드사는 고정 주소 /widget/v1.js만 설치합니다.",
+                  "기능 업데이트는 GitHub 병합 후 Vercel 배포로 반영됩니다.",
+                  "위젯 캐시는 짧게 유지되어 배포 후 몇 분 안에 최신 안정본을 받습니다.",
+                  "OpenAI API 키와 서버 토큰은 브라우저에 노출되지 않습니다.",
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2">
                     <CheckCircle2Icon className="mt-0.5 size-4 text-emerald-600" />
@@ -305,7 +305,7 @@ export default function WebsitePage() {
                 ))}
               </div>
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm leading-6 text-emerald-800">
-                고객/광고주 임의 쿠키는 읽지 않고, SlipAI 전용 익명 방문 ID와 이벤트만 사용합니다.
+                고객이나 광고주의 임의 쿠키는 읽지 않고, SlipAI 전용 익명 방문 ID와 온사이트 이벤트만 사용합니다.
               </div>
             </CardContent>
           </Card>
@@ -335,8 +335,8 @@ export default function WebsitePage() {
             <CardContent className="p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-base font-semibold text-slate-950">스크립트가 감지된 홈페이지</h2>
-                  <p className="mt-1 text-sm text-slate-500">서버에 들어온 이벤트 기준으로 설치 도메인을 묶어 보여줍니다.</p>
+                  <h2 className="text-base font-semibold text-slate-950">스크립트가 감지한 자사몰</h2>
+                  <p className="mt-1 text-sm text-slate-500">서버로 들어온 이벤트 기준으로 설치 도메인과 최근 적용 위치를 보여줍니다.</p>
                 </div>
                 <Button onClick={loadOps} disabled={isLoading} variant="outline">
                   <RefreshCwIcon className={isLoading ? "size-4 animate-spin" : "size-4"} />
@@ -397,7 +397,7 @@ export default function WebsitePage() {
                     {!summary?.installedSites.length ? (
                       <tr>
                         <td className="px-3 py-6 text-slate-500" colSpan={5}>
-                          아직 감지된 설치 도메인이 없습니다. 테스트 사이트에 위 스크립트를 설치한 뒤 새로고침하세요.
+                          아직 감지된 설치 도메인이 없습니다. 테스트 사이트에 스크립트를 설치한 뒤 새로고침하세요.
                         </td>
                       </tr>
                     ) : null}
@@ -411,7 +411,7 @@ export default function WebsitePage() {
             <CardContent className="space-y-4 p-5">
               <div>
                 <h2 className="text-base font-semibold text-slate-950">적용 상태</h2>
-                <p className="mt-1 text-sm text-slate-500">위젯이 실제로 무엇을 하고 있는지 빠르게 확인합니다.</p>
+                <p className="mt-1 text-sm text-slate-500">현재 스크립트가 실제로 무엇을 하고 있는지 빠르게 확인합니다.</p>
               </div>
               <div className="grid gap-3">
                 <div className="rounded-lg border border-slate-200 p-3">

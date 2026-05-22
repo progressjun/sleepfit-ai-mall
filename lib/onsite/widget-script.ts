@@ -6,7 +6,7 @@
   var widgetBrand = "SlipAI";
   if ((window.__C24AI && window.__C24AI.version) || (window.__SLIPAI && window.__SLIPAI.version)) return;
 
-  var VERSION = "0.3.1";
+  var VERSION = "0.3.3";
   var DEFAULT_SESSION_FREQUENCY_CAP = ${JSON.stringify(process.env.ONSITE_WIDGET_SESSION_FREQUENCY_CAP?.trim() || "3")};
   var script =
     document.currentScript ||
@@ -363,14 +363,14 @@
   var host = createHost();
   var shadow = host.attachShadow({ mode: "open" });
   var css =
-    ".wrap{all:initial;position:relative;width:360px;max-width:100%;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;pointer-events:auto;color:#101010}.banner,.chat{box-sizing:border-box;border:1px solid rgba(13,13,13,.12);background:rgba(255,255,255,.98);box-shadow:0 18px 54px rgba(0,0,0,.16),0 1px 0 rgba(255,255,255,.8) inset;border-radius:14px;overflow:hidden}.banner{display:none;margin-bottom:10px;transform-origin:bottom right}.banner.on{display:block;animation:c24aiSlideIn .36s cubic-bezier(.2,.8,.2,1)}.banner-body{padding:14px}.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:#6b7280;font-weight:700}.eyebrow:before{content:'';display:inline-block;width:7px;height:7px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.14);animation:c24aiPulse 2.2s ease-in-out infinite}.msg{margin:10px 0 12px;font-size:14px;line-height:1.48;font-weight:650}.review-wrap{display:none;margin-bottom:10px}.review-card{position:relative;background:#f7f7f8;border:1px solid #e5e5e5;border-radius:8px;padding:11px 12px 11px 42px;color:#1d2430}.review-card:before{content:'';position:absolute;left:14px;top:16px;width:12px;height:12px;border-radius:999px;background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 0 0 4px rgba(16,185,129,.12)}.review-copy{font-size:12px;line-height:1.5;font-weight:500}.review-meta{margin-top:6px;font-size:10px;color:#6b7280}.review-dots{display:flex;gap:4px;margin-top:8px}.review-dot{width:5px;height:5px;border-radius:999px;background:#d7d7d7;transition:all .2s ease}.review-dot.on{width:18px;background:#101010}.product-strip{display:grid;gap:7px}.product-card{appearance:none;width:100%;box-sizing:border-box;text-align:left;background:#fff;border:1px solid #ececf1;border-radius:8px;padding:10px 12px 10px 11px;display:grid;grid-template-columns:minmax(0,58px) minmax(0,1fr);gap:10px;align-items:center;cursor:pointer}.product-card.no-media{grid-template-columns:minmax(0,1fr);padding-right:28px}.product-card:after{content:'';position:absolute;right:12px;top:50%;width:6px;height:6px;border-top:1.5px solid #8e8ea0;border-right:1.5px solid #8e8ea0;transform:translateY(-50%) rotate(45deg)}.product-card:hover{transform:translateY(-1px);border-color:#d9d9e3;box-shadow:0 8px 18px rgba(0,0,0,.07)}.product-media{width:58px;height:58px;border-radius:8px;overflow:hidden;background:#f4f4f4;border:1px solid #ececf1}.product-media img{display:block;width:100%;height:100%;object-fit:cover}.product-copy{min-width:0}.product-kicker{font-size:10px;color:#6b7280;font-weight:700}.product-name{margin-top:3px;font-size:12px;line-height:1.35;font-weight:760}.product-reason{margin-top:4px;font-size:11px;color:#5f6368;line-height:1.4}.product-price{margin-top:5px;font-size:11px;font-weight:760;color:#0d0d0d}.actions{display:flex;gap:8px;margin-top:12px}.btn{appearance:none;border:0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.2;font-weight:720;cursor:pointer}.btn:hover{transform:translateY(-1px)}.primary{background:#0d0d0d;color:#fff}.ghost{background:#f3f3f5;color:#171717;border:1px solid #e2e2e2}.tiny{margin-top:8px;font-size:11px;color:#8a8fa1}.chat{display:none;height:430px;max-height:70vh;transform-origin:bottom right}.chat.on{display:flex;flex-direction:column;animation:c24aiPanelIn .28s cubic-bezier(.2,.8,.2,1)}.head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ececf1}.title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:760}.title:before{content:'';width:8px;height:8px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.16);animation:c24aiPulse 1.8s ease-in-out infinite}.close,.launcher{appearance:none;border:0;cursor:pointer}.close{background:#f4f4f4;color:#555;border-radius:8px;font-size:18px;line-height:1;width:30px;height:30px}.messages{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f7f7f8}.bubble{max-width:88%;border-radius:10px;padding:9px 10px;font-size:13px;line-height:1.42;animation:c24aiBubble .2s ease-out}.assistant{align-self:flex-start;background:#fff;border:1px solid #e5e5e5}.visitor{align-self:flex-end;background:#0d0d0d;color:#fff}.typing{display:flex;gap:4px;align-items:center}.typing i{display:block;width:6px;height:6px;border-radius:999px;background:#10b981;animation:c24aiDot 1s ease-in-out infinite}.typing i:nth-child(2){animation-delay:.14s}.typing i:nth-child(3){animation-delay:.28s}.form{display:flex;gap:8px;padding:10px;border-top:1px solid #ececf1}.input{min-width:0;flex:1;border:1px solid #d9d9e3;border-radius:8px;padding:10px;font-size:13px;outline:none}.input:focus{border-color:#a9a9b3;box-shadow:0 0 0 3px rgba(13,13,13,.06)}.launcher{position:relative;display:flex;align-items:center;justify-content:center;margin-left:auto;width:58px;height:58px;border-radius:999px;background:#0d0d0d;color:#fff;font-size:14px;font-weight:760;box-shadow:0 14px 38px rgba(0,0,0,.22);overflow:hidden;animation:c24aiFloat 3.4s ease-in-out infinite}.launcher:before{content:'';position:absolute;inset:8px;border-radius:999px;border:1px solid rgba(255,255,255,.22)}.launcher:after{content:'';position:absolute;inset:-1px;border-radius:999px;border:1px solid rgba(255,255,255,.18);animation:c24aiRing 2.8s ease-out infinite}.product-item{position:relative}.hidden{display:none} @keyframes c24aiSlideIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiPanelIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes c24aiPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.86)}}@keyframes c24aiRing{0%{opacity:.7;transform:scale(.84)}100%{opacity:0;transform:scale(1.18)}}@keyframes c24aiBubble{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes c24aiDot{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}@media (max-width:480px){.launcher{width:56px;height:56px}.chat{height:68vh}.msg{font-size:13px}.product-price{font-size:10.5px}.product-reason{font-size:10px}}";
+    ".wrap{all:initial;position:relative;width:360px;max-width:100%;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;pointer-events:auto;color:#101010}.banner,.chat{box-sizing:border-box;border:1px solid rgba(13,13,13,.12);background:rgba(255,255,255,.98);box-shadow:0 18px 54px rgba(0,0,0,.16),0 1px 0 rgba(255,255,255,.8) inset;border-radius:14px;overflow:hidden}.banner{display:none;position:relative;margin-bottom:10px;transform-origin:bottom right}.banner.on{display:block;animation:c24aiSlideIn .36s cubic-bezier(.2,.8,.2,1)}.banner-close{appearance:none;position:absolute;right:10px;top:10px;border:0;background:#f4f4f4;color:#555;border-radius:8px;font-size:16px;line-height:1;width:28px;height:28px;cursor:pointer;z-index:2}.banner-body{padding:14px 44px 14px 14px}.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:#6b7280;font-weight:700}.eyebrow:before{content:'';display:inline-block;width:7px;height:7px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.14);animation:c24aiPulse 2.2s ease-in-out infinite}.msg{margin:10px 0 12px;font-size:14px;line-height:1.48;font-weight:650}.review-wrap{display:none;margin-bottom:10px}.review-card{position:relative;background:#f7f7f8;border:1px solid #e5e5e5;border-radius:8px;padding:11px 12px 11px 42px;color:#1d2430}.review-card:before{content:'';position:absolute;left:14px;top:16px;width:12px;height:12px;border-radius:999px;background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 0 0 4px rgba(16,185,129,.12)}.review-copy{font-size:12px;line-height:1.5;font-weight:500}.review-meta{margin-top:6px;font-size:10px;color:#6b7280}.review-dots{display:flex;gap:4px;margin-top:8px}.review-dot{width:5px;height:5px;border-radius:999px;background:#d7d7d7;transition:all .2s ease}.review-dot.on{width:18px;background:#101010}.product-strip{display:grid;gap:7px}.product-card{appearance:none;width:100%;box-sizing:border-box;text-align:left;background:#fff;border:1px solid #ececf1;border-radius:8px;padding:10px 12px 10px 11px;display:grid;grid-template-columns:minmax(0,58px) minmax(0,1fr);gap:10px;align-items:center;cursor:pointer}.product-card.no-media{grid-template-columns:minmax(0,1fr);padding-right:28px}.product-card:after{content:'';position:absolute;right:12px;top:50%;width:6px;height:6px;border-top:1.5px solid #8e8ea0;border-right:1.5px solid #8e8ea0;transform:translateY(-50%) rotate(45deg)}.product-card:hover{transform:translateY(-1px);border-color:#d9d9e3;box-shadow:0 8px 18px rgba(0,0,0,.07)}.product-media{width:58px;height:58px;border-radius:8px;overflow:hidden;background:#f4f4f4;border:1px solid #ececf1}.product-media img{display:block;width:100%;height:100%;object-fit:cover}.product-copy{min-width:0}.product-kicker{font-size:10px;color:#6b7280;font-weight:700}.product-name{margin-top:3px;font-size:12px;line-height:1.35;font-weight:760}.product-reason{margin-top:4px;font-size:11px;color:#5f6368;line-height:1.4}.product-price{margin-top:5px;font-size:11px;font-weight:760;color:#0d0d0d}.actions{display:flex;gap:8px;margin-top:12px}.btn{appearance:none;border:0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.2;font-weight:720;cursor:pointer}.btn:hover{transform:translateY(-1px)}.primary{background:#0d0d0d;color:#fff}.ghost{background:#f3f3f5;color:#171717;border:1px solid #e2e2e2}.tiny{margin-top:8px;font-size:11px;color:#8a8fa1}.chat{display:none;height:430px;max-height:70vh;transform-origin:bottom right}.chat.on{display:flex;flex-direction:column;animation:c24aiPanelIn .28s cubic-bezier(.2,.8,.2,1)}.head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ececf1}.title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:760}.title:before{content:'';width:8px;height:8px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.16);animation:c24aiPulse 1.8s ease-in-out infinite}.close,.launcher{appearance:none;border:0;cursor:pointer}.close{background:#f4f4f4;color:#555;border-radius:8px;font-size:18px;line-height:1;width:30px;height:30px}.messages{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f7f7f8}.bubble{max-width:88%;border-radius:10px;padding:9px 10px;font-size:13px;line-height:1.42;animation:c24aiBubble .2s ease-out}.assistant{align-self:flex-start;background:#fff;border:1px solid #e5e5e5}.visitor{align-self:flex-end;background:#0d0d0d;color:#fff}.typing{display:flex;gap:4px;align-items:center}.typing i{display:block;width:6px;height:6px;border-radius:999px;background:#10b981;animation:c24aiDot 1s ease-in-out infinite}.typing i:nth-child(2){animation-delay:.14s}.typing i:nth-child(3){animation-delay:.28s}.form{display:flex;gap:8px;padding:10px;border-top:1px solid #ececf1}.input{min-width:0;flex:1;border:1px solid #d9d9e3;border-radius:8px;padding:10px;font-size:13px;outline:none}.input:focus{border-color:#a9a9b3;box-shadow:0 0 0 3px rgba(13,13,13,.06)}.launcher{position:relative;display:flex;align-items:center;justify-content:center;margin-left:auto;width:58px;height:58px;border-radius:999px;background:#0d0d0d;color:#fff;font-size:14px;font-weight:760;box-shadow:0 14px 38px rgba(0,0,0,.22);overflow:hidden;animation:c24aiFloat 3.4s ease-in-out infinite}.launcher:before{content:'';position:absolute;inset:8px;border-radius:999px;border:1px solid rgba(255,255,255,.22)}.launcher:after{content:'';position:absolute;inset:-1px;border-radius:999px;border:1px solid rgba(255,255,255,.18);animation:c24aiRing 2.8s ease-out infinite}.product-item{position:relative}.hidden{display:none} @keyframes c24aiSlideIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiPanelIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes c24aiPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.86)}}@keyframes c24aiRing{0%{opacity:.7;transform:scale(.84)}100%{opacity:0;transform:scale(1.18)}}@keyframes c24aiBubble{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes c24aiDot{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}@media (max-width:480px){.banner-body{padding-right:42px}.launcher{width:56px;height:56px}.chat{height:68vh}.msg{font-size:13px}.product-price{font-size:10.5px}.product-reason{font-size:10px}}";
 
   shadow.innerHTML =
     "<style>" +
     css +
     "</style>" +
     '<div class="wrap">' +
-    '<div class="banner" part="banner"><div class="banner-body">' +
+    '<div class="banner" part="banner"><button class="banner-close" type="button" aria-label="추천 배너 닫기">×</button><div class="banner-body">' +
     '<div class="eyebrow">SlipAI 추천</div>' +
     '<div class="msg"></div>' +
     '<div class="review-wrap"><div class="review-card"><div class="review-copy"></div><div class="review-meta"></div><div class="review-dots"></div></div></div>' +
@@ -395,9 +395,10 @@
   var productStrip = shadow.querySelector(".product-strip");
   var primaryButton = shadow.querySelector(".banner .primary");
   var ghostButton = shadow.querySelector(".banner .ghost");
+  var bannerCloseButton = shadow.querySelector(".banner-close");
   var chat = shadow.querySelector(".chat");
   var launcher = shadow.querySelector(".launcher");
-  var closeButton = shadow.querySelector(".close");
+  var closeButton = shadow.querySelector(".chat .close");
   var messages = shadow.querySelector(".messages");
   var form = shadow.querySelector(".form");
   var input = shadow.querySelector(".input");
@@ -469,6 +470,7 @@
 
   function runCta(action) {
     track("banner_cta_click", { action: action });
+    track("click", { surface: "banner", action: action });
     if (action === "open_chat") {
       openChat();
       return;
@@ -576,6 +578,7 @@
         var idx = i;
         button.onclick = function () {
           track("banner_cta_click", { action: "related_product_click", productNo: nextProductNo || "", index: idx + 1 });
+          track("click", { surface: "banner_product_card", action: "related_product_click", productNo: nextProductNo || "", index: idx + 1 });
           if (nextUrl && nextUrl !== window.location.href) {
             window.location.href = nextUrl;
           } else {
@@ -652,6 +655,7 @@
     };
     ghostButton.onclick = openChat;
     banner.classList.add("on");
+    track("impression", { surface: "banner", ctaAction: data.cta && data.cta.action ? data.cta.action : "" });
     markRecommendationShown();
   }
 
@@ -693,7 +697,10 @@
       })
     )
       .then(function (result) {
-        if (result && result.data) showBanner(result.data);
+        if (result && result.data) {
+          track("banner_resolved", { trigger: trigger, surface: result.data.surface || "banner" });
+          showBanner(result.data);
+        }
       })
       .catch(function () {
         recommendationTriggers[trigger] = false;
@@ -817,7 +824,14 @@
   }
 
   launcher.addEventListener("click", openChat);
-  closeButton.addEventListener("click", closeChat);
+  bannerCloseButton.addEventListener("click", function () {
+    track("close", { surface: "banner" });
+    clearBanner();
+  });
+  closeButton.addEventListener("click", function () {
+    track("close", { surface: "chat" });
+    closeChat();
+  });
   ghostButton.addEventListener("click", openChat);
   form.addEventListener("submit", function (event) {
     event.preventDefault();

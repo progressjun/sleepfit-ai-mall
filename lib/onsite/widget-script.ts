@@ -8,8 +8,11 @@
 
   var VERSION = "0.3.3";
   var DEFAULT_SESSION_FREQUENCY_CAP = ${JSON.stringify(process.env.ONSITE_WIDGET_SESSION_FREQUENCY_CAP?.trim() || "3")};
+  var DEFAULT_PROJECT_KEY = ${JSON.stringify(process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_PROJECT_KEY?.trim() || "pk_slipai_test")};
+  var DEFAULT_MALL_ID = ${JSON.stringify(process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_MALL_ID?.trim() || "slipai-test-kr")};
   var script =
     document.currentScript ||
+    document.querySelector('script[src*="/onsite.js"]') ||
     document.querySelector('script[src*="/widget/v1.js"]') ||
     document.querySelector('script[src*="/api/widget/v1.js"]');
 
@@ -30,8 +33,12 @@
   }
 
   var initConfig = queuedInitConfig();
-  var projectKey = script.getAttribute("data-project-key") || initConfig.projectKey || "";
-  var mallId = script.getAttribute("data-mall-id") || initConfig.mallId || "";
+  var siteId = script.getAttribute("data-site-id") || initConfig.siteId || "";
+  var explicitProjectKey = script.getAttribute("data-project-key") || initConfig.projectKey || "";
+  var explicitMallId = script.getAttribute("data-mall-id") || initConfig.mallId || "";
+  var siteLooksLikeProjectKey = /^pk_[A-Za-z0-9_-]+$/.test(siteId);
+  var projectKey = explicitProjectKey || (siteId ? (siteLooksLikeProjectKey ? siteId : DEFAULT_PROJECT_KEY) : "");
+  var mallId = explicitMallId || (siteId && !siteLooksLikeProjectKey ? siteId : "") || (siteId ? DEFAULT_MALL_ID : "");
   var widgetToken =
     script.getAttribute("data-widget-token") ||
     script.getAttribute("data-token") ||
@@ -52,7 +59,7 @@
   var apiBase = initConfig.apiBase || new URL(script.src, window.location.href).origin;
 
   if (!projectKey || !mallId) {
-    if (debug) console.warn("[" + widgetBrand + "] Missing data-project-key or data-mall-id.");
+    if (debug) console.warn("[" + widgetBrand + "] Missing data-project-key/data-mall-id or data-site-id.");
     return;
   }
   if (!/^pk_[A-Za-z0-9_-]+$/.test(projectKey)) {
@@ -914,7 +921,7 @@
 
     window.__C24AI = {
       version: VERSION,
-      config: { projectKey: projectKey, mallId: mallId },
+      config: { projectKey: projectKey, mallId: mallId, siteId: siteId || mallId },
       track: track,
       openChat: openChat,
       closeChat: closeChat,
@@ -946,6 +953,24 @@
       },
     };
     window.__SLIPAI = window.__C24AI;
+    window.PMOnsite = {
+      version: VERSION,
+      track: function (eventName, metadata) {
+        if (eventName) track(eventName, metadata || {});
+        return window.__C24AI;
+      },
+      open: function () {
+        openChat();
+        return window.__C24AI;
+      },
+      close: function () {
+        closeChat();
+        return window.__C24AI;
+      },
+      getState: function () {
+        return window.__C24AI.getState();
+      },
+    };
 
     window.slipai = function (command, payload) {
       if (command === "open" || command === "openChat") {

@@ -43,7 +43,8 @@ npm install
 ```html
 <script
   async
-  src="https://YOUR_APP_DOMAIN/widget/v1.js"
+  src="https://YOUR_APP_DOMAIN/onsite.js"
+  data-site-id="your_mall_id"
   data-project-key="pk_your_project_key"
   data-mall-id="your_mall_id"
   data-widget-token="your_widget_token_if_configured"

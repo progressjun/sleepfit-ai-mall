@@ -123,22 +123,16 @@ function buildInstallSnippet({
   mallId: string;
   widgetToken: string;
 }) {
-  const tokenLine = widgetToken.trim() ? `    token: "${widgetToken.trim()}",\n` : "";
+  const tokenAttr = widgetToken.trim() ? `\n  data-widget-token="${widgetToken.trim()}"` : "";
 
-  return `<script>
-  window.slipai =
-    window.slipai ||
-    function () {
-      (window.slipai.q = window.slipai.q || []).push(arguments);
-    };
-
-  window.slipai("init", {
-    projectKey: "${projectKey}",
-    mallId: "${mallId}",
-${tokenLine}    dwellSeconds: 30
-  });
-</script>
-<script async src="${origin}/widget/v1.js"></script>`;
+  return `<script
+  async
+  src="${origin}/onsite.js"
+  data-site-id="${mallId}"
+  data-project-key="${projectKey}"
+  data-mall-id="${mallId}"${tokenAttr}
+  data-dwell-seconds="30">
+</script>`;
 }
 
 export default function WebsitePage() {
@@ -293,7 +287,7 @@ export default function WebsitePage() {
               </div>
               <div className="space-y-3 text-sm">
                 {[
-                  "브랜드사는 고정 주소 /widget/v1.js만 설치합니다.",
+                  "브랜드사는 고정 주소 /onsite.js 원태그만 설치합니다.",
                   "기능 업데이트는 GitHub 병합 후 Vercel 배포로 반영됩니다.",
                   "위젯 캐시는 짧게 유지되어 배포 후 몇 분 안에 최신 안정본을 받습니다.",
                   "OpenAI API 키와 서버 토큰은 브라우저에 노출되지 않습니다.",

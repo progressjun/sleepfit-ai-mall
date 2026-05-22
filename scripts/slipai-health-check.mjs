@@ -169,6 +169,10 @@ async function checkWidgetScript() {
   const { response, text } = await fetchText(`/widget/v1.js?health=${Date.now()}`);
   record("widget script status", response.ok, `${response.status} ${response.statusText}`);
   record("widget exposes namespace", text.includes("window.__SLIPAI"), "window.__SLIPAI 확인");
+  const compat = await fetchText(`/onsite.js?health=${Date.now()}`);
+  record("onsite.js compatibility status", compat.response.ok, `${compat.response.status} ${compat.response.statusText}`);
+  record("onsite.js data-site-id support", compat.text.includes("data-site-id"), "data-site-id 원태그 확인");
+  record("onsite.js PMOnsite support", compat.text.includes("window.PMOnsite"), "PMOnsite 호환 API 확인");
   record("widget Korean title", text.includes("SlipAI 상담사"), "상담사 타이틀 한글 확인");
   record("widget Korean input", text.includes("이 쇼핑몰에서 어떤 점이 고민되나요?"), "기본 입력 placeholder 한글 확인");
   record("widget Korean send button", text.includes(">전송<"), "전송 버튼 한글 확인");
@@ -207,6 +211,19 @@ async function checkContextEventAndOps() {
   );
   record("context no mojibake", !hasMojibake(JSON.stringify(context)), "컨텍스트 응답 깨진 한글 미검출");
 
+  const resolveResult = await fetchJson("/api/widget/resolve", {
+    siteId: mallId,
+    visitorId,
+    sessionId,
+    pageUrl: page.url,
+    path: "/health",
+    referrer: page.referrer,
+    productContext: product,
+  });
+  record("compat widget resolve status", resolveResult.response.ok, `${resolveResult.response.status} ${resolveResult.text.slice(0, 120)}`);
+  record("compat widget resolve banner", resolveResult.json?.banner?.show === true, JSON.stringify(resolveResult.json?.banner || {}).slice(0, 160));
+  record("compat widget resolve chat", resolveResult.json?.chat?.enabled === true, JSON.stringify(resolveResult.json?.chat || {}).slice(0, 160));
+
   const payload = {
     projectKey,
     mallId,
@@ -221,6 +238,19 @@ async function checkContextEventAndOps() {
   const eventResult = await fetchJson("/api/onsite/events", payload);
   record("event API status", eventResult.response.ok, `${eventResult.response.status} ${eventResult.text.slice(0, 120)}`);
   record("event API ok", eventResult.json?.ok === true, JSON.stringify(eventResult.json || {}).slice(0, 180));
+
+  const compatEventResult = await fetchJson("/api/events", {
+    siteId: mallId,
+    visitorId,
+    sessionId,
+    eventName: "banner_impression",
+    pageUrl: page.url,
+    productContext: product,
+    payload: { source: "slipai-health-check" },
+    timestamp: new Date().toISOString(),
+  });
+  record("compat event API status", compatEventResult.response.ok, `${compatEventResult.response.status} ${compatEventResult.text.slice(0, 120)}`);
+  record("compat event API ok", compatEventResult.json?.ok === true, JSON.stringify(compatEventResult.json || {}).slice(0, 180));
 
   const opsResult = await fetchOps();
   record("ops API status", opsResult.response.ok, `${opsResult.response.status} ${opsResult.text.slice(0, 120)}`);
@@ -246,6 +276,23 @@ async function checkScopeGuardChat() {
     message.slice(0, 160),
   );
   record("scope guard no mojibake", !hasMojibake(message), message.slice(0, 120));
+
+  const compatBlocked = await fetchJson("/api/chat", {
+    siteId: mallId,
+    visitorId,
+    sessionId,
+    message: "자바스크립트 코딩 알려줘",
+    pageUrl: page.url,
+    productContext: product,
+  });
+  const compatMessage = compatBlocked.json?.answer || "";
+  record("compat chat status", compatBlocked.response.ok, `${compatBlocked.response.status} ${compatBlocked.text.slice(0, 120)}`);
+  record("compat chat Korean refusal", hasKorean(compatMessage), compatMessage.slice(0, 120));
+  record(
+    "compat chat blocks coding",
+    /코딩|답변하지 않습니다|쇼핑몰/.test(compatMessage),
+    compatMessage.slice(0, 160),
+  );
 }
 
 async function checkAiRecommendations() {

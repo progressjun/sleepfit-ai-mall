@@ -31,7 +31,11 @@ export const onsitePageContextSchema = z.object({
 
 export const onsiteEventNameSchema = z.enum([
   "page_view",
+  "widget_resolved",
   "banner_resolved",
+  "banner_impression",
+  "banner_click",
+  "banner_close",
   "impression",
   "click",
   "close",
@@ -42,8 +46,14 @@ export const onsiteEventNameSchema = z.enum([
   "scroll",
   "cart_click",
   "chat_open",
+  "chat_close",
   "chat_message",
+  "chat_message_sent",
+  "chat_answer_generated",
+  "chat_cta_click",
   "banner_cta_click",
+  "lead_form_open",
+  "lead_submit",
 ]);
 
 export const onsiteEventRequestSchema = z.object({

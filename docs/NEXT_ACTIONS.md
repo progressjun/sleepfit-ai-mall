@@ -10,11 +10,12 @@
    - Home first visit banner (`public/slipai-home-demo.html`)
    - Product detail dwell banner (`public/slipai-product-demo.html`)
    - Init queue install (`public/slipai-init-demo.html`)
+   - One-line `/onsite.js` + `data-site-id` install on a hosted test storefront.
 7. Add an automated smoke check for the menu-free `/website` install ops screen.
 8. Verify crawler behavior on a real Cafe24 staging mall with multiple product detail URL formats.
 9. Add a small support checklist for confirming card click-through URLs and image extraction quality after install.
 10. Keep crawler smoke-test artifacts fresh after each rollout and verify banner + chat open + recommendation response after dwell.
-11. For feature updates, ship through PR -> Vercel Preview -> Production merge so installed storefronts pick up the stable `/widget/v1.js` release automatically.
+11. For feature updates, ship through PR -> Vercel Preview -> Production merge so installed storefronts pick up the stable `/onsite.js` or `/widget/v1.js` release automatically.
 12. Before adding a generic campaign manager, design persistence/auth/permission boundaries for campaign tables instead of adding ad-hoc DB schema.
 
 ## Priority 2

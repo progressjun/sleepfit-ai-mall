@@ -6,7 +6,7 @@
 GitHub repository
   -> Vercel Git Integration
   -> Production URL such as https://YOUR_SLIPAI_PROJECT.vercel.app
-  -> Storefront installs /widget/v1.js from that URL
+  -> Storefront installs /onsite.js or /widget/v1.js from that URL
   -> Future SlipAI releases are reflected automatically from the same stable script URL
 ```
 
@@ -41,6 +41,8 @@ ONSITE_OPENAI_MAX_OUTPUT_TOKENS=900
 ONSITE_OPENAI_REASONING_EFFORT=minimal
 
 NEXT_PUBLIC_SLIPAI_PUBLIC_ORIGIN=https://YOUR_SLIPAI_PROJECT.vercel.app
+NEXT_PUBLIC_SLIPAI_DEFAULT_PROJECT_KEY=pk_slipai_test
+NEXT_PUBLIC_SLIPAI_DEFAULT_MALL_ID=slipai-test-kr
 ONSITE_WIDGET_ALLOWED_ORIGINS=https://your-mall.cafe24.com,https://www.your-mall.com
 ONSITE_WIDGET_SHARED_SECRET=use-a-long-random-secret
 
@@ -65,7 +67,15 @@ serverless instances can cold-start or scale across instances, so crawler/catalo
 
 ## Storefront Install Script
 
-After Vercel creates the public URL, install this once before `</body>` in the Cafe24 common layout:
+After Vercel creates the public URL, install this once before `</body>` in the Cafe24 common layout.
+For the simplest advertiser-facing install, use the compatibility one-liner:
+
+```html
+<script async src="https://YOUR_SLIPAI_PROJECT.vercel.app/onsite.js" data-site-id="brand_mall_id"></script>
+```
+
+For explicit project key, mall ID, shared-secret, and timing controls, use the advanced SlipAI init
+snippet:
 
 ```html
 <script>
@@ -89,15 +99,15 @@ If no `ONSITE_WIDGET_SHARED_SECRET` is set, omit `token`, but production should 
 `ONSITE_WIDGET_ALLOWED_ORIGINS`.
 
 Do not pin the script with a version query string in production storefront installs. The stable
-`/widget/v1.js` URL lets SlipAI feature releases ship from GitHub -> Vercel without asking each
-brand to edit Cafe24 again. The widget response uses a short production cache so updates are picked
-up quickly while still protecting the server from excessive script fetches.
+`/onsite.js` and `/widget/v1.js` URLs let SlipAI feature releases ship from GitHub -> Vercel without
+asking each brand to edit Cafe24 again. The widget response uses a short production cache so updates
+are picked up quickly while still protecting the server from excessive script fetches.
 
 ## Smoke Check
 
 1. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/website`.
 2. Confirm the copied install snippet uses the Vercel URL, not `localhost` or a tunnel URL.
-3. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/widget/v1.js`.
+3. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/onsite.js`.
 4. Confirm the response contains `SlipAI 상담사`.
 5. Install the snippet on a test storefront.
 6. In the browser console, confirm `window.__SLIPAI.getState()` exists.

@@ -20,6 +20,8 @@
 - Added `docs/ONSITE_ONE_TAG_ARCHITECTURE.md` to lock the product direction as a loader SDK + server decision API + event tracking system.
 - Cleaned onsite recommendation/chat fallback Korean copy so AI fallback responses stay readable.
 - Expanded onsite event validation and widget tracking for `banner_resolved`, `impression`, `click`, `close`, and conversion-style manual events.
+- Added `/onsite.js` one-line install compatibility plus `/api/widget/resolve`, `/api/chat`, and `/api/events` compatibility endpoints for generic onsite banner/advisor integrations.
+- Added `data-site-id` support and `window.PMOnsite.track/open/close/getState` compatibility while keeping the existing SlipAI init queue and server-only OpenAI API flow.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

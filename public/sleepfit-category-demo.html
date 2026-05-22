@@ -34,6 +34,27 @@
         color: #66574c;
       }
 
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 0 0 28px;
+      }
+
+      .demo-open {
+        border: 0;
+        border-radius: 8px;
+        padding: 13px 18px;
+        color: #fff;
+        background: #201610;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .demo-open:hover {
+        transform: translateY(-1px);
+      }
+
       .grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -45,6 +66,8 @@
         border-radius: 10px;
         background: #fff;
         overflow: hidden;
+        color: inherit;
+        text-decoration: none;
       }
 
       .card img {
@@ -86,31 +109,54 @@
     <main>
       <h1>베개</h1>
       <p class="lead">카테고리에서는 하단 플로팅 버튼으로 수면핏 진단을 시작합니다.</p>
+      <div class="hero-actions">
+        <button id="sleepfit-demo-open" class="demo-open" type="button">수면핏 진단 시작하기</button>
+      </div>
       <section class="grid">
-        <article class="card">
+        <a class="card" href="https://sleepnsleepmall.com/product/detail.html?product_no=330">
           <img
             src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg"
             alt="[슬립앤슬립] 깊은잠베개"
           />
           <div><strong>[슬립앤슬립] 깊은잠베개</strong><span>94,900원</span></div>
-        </article>
-        <article class="card">
+        </a>
+        <a class="card" href="https://sleepnsleepmall.com/product/detail.html?product_no=345">
           <img
             src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202410/4c2883d241621aed34f65b29e2962bc9.jpg"
             alt="[슬립앤슬립] 와이드핏 베개"
           />
           <div><strong>[슬립앤슬립] 와이드핏 베개</strong><span>157,500원</span></div>
-        </article>
-        <article class="card">
+        </a>
+        <a class="card" href="https://sleepnsleepmall.com/product/detail.html?product_no=36">
           <img
             src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202402/675a7c807e6e683d7aac7024d1ffdca5.jpg"
             alt="[슬립앤슬립] 리얼 오가닉 베개"
           />
           <div><strong>[슬립앤슬립] 리얼 오가닉 베개</strong><span>79,000원</span></div>
-        </article>
+        </a>
       </section>
     </main>
 
     <script async src="/sleepfit.js" data-mall-id="sleepnsleepmall" data-debug="true"></script>
+    <script>
+      document.getElementById("sleepfit-demo-open").addEventListener("click", function () {
+        var tries = 0;
+        function openWidget() {
+          tries += 1;
+          if (window.sleepfitAI && typeof window.sleepfitAI.open === "function") {
+            window.sleepfitAI.open();
+            return;
+          }
+          var host = document.querySelector("[data-sleepfit-host]");
+          var launcher = host && host.shadowRoot ? host.shadowRoot.querySelector(".launcher") : null;
+          if (launcher) {
+            launcher.click();
+            return;
+          }
+          if (tries < 20) window.setTimeout(openWidget, 150);
+        }
+        openWidget();
+      });
+    </script>
   </body>
 </html>

@@ -297,6 +297,10 @@ export function buildSleepfitWidgetScript() {
       host.style.bottom = "18px";
       host.style.zIndex = "2147483001";
       host.style.maxWidth = "calc(100vw - 28px)";
+      host.setAttribute("role", "button");
+      host.setAttribute("tabindex", "0");
+      host.setAttribute("aria-label", "나에게 맞는 베개 찾기");
+      host.setAttribute("aria-expanded", "false");
       document.documentElement.appendChild(host);
     }
 
@@ -331,6 +335,9 @@ export function buildSleepfitWidgetScript() {
 
   function openPanel() {
     root.classList.remove("closed");
+    if (!root.classList.contains("inline")) {
+      host.setAttribute("aria-expanded", "true");
+    }
     opened = true;
     if (!safeStorageGet(window.sessionStorage, "sleepfit_started_" + sessionId)) {
       safeStorageSet(window.sessionStorage, "sleepfit_started_" + sessionId, "1");
@@ -342,6 +349,7 @@ export function buildSleepfitWidgetScript() {
   function closePanel() {
     if (root.classList.contains("inline")) return;
     root.classList.add("closed");
+    host.setAttribute("aria-expanded", "false");
   }
 
   function progressWidth() {
@@ -563,6 +571,19 @@ export function buildSleepfitWidgetScript() {
 
     if (launcher) launcher.addEventListener("click", openPanel);
     if (closeButton) closeButton.addEventListener("click", closePanel);
+    if (!root.classList.contains("inline")) {
+      host.addEventListener("click", function (event) {
+        var path = typeof event.composedPath === "function" ? event.composedPath() : [];
+        if (closeButton && path.indexOf(closeButton) !== -1) return;
+        if (!root.classList.contains("closed") && launcher && path.indexOf(launcher) === -1) return;
+        if (root.classList.contains("closed")) openPanel();
+      });
+      host.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        openPanel();
+      });
+    }
 
     if (product.pageType === "product_detail") {
       openPanel();

@@ -19,6 +19,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -35,6 +36,7 @@ tmp-dev*.log
 temp-*.log
 .tmp/
 cloudflared.exe
+tools/sanggyu-work-alarm/
 
 # env files (can opt-in for committing if needed)
 .env*

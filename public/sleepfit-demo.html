@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta property="og:title" content="[슬립앤슬립] 깊은잠베개" />
+    <meta property="og:image" content="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg" />
+    <meta property="product:price:amount" content="94900" />
+    <title>SleepFit AI 데모 | 깊은잠베개</title>
+    <style>
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "Noto Sans KR",
+          sans-serif;
+        color: #201610;
+        background: #f7f3ef;
+      }
+
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 44px 20px 160px;
+      }
+
+      .product {
+        display: grid;
+        grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
+        gap: 34px;
+        align-items: start;
+        padding: 28px;
+        border: 1px solid #e4d9cf;
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .product-image {
+        width: 100%;
+        aspect-ratio: 1;
+        border: 1px solid #eadfd5;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #f1ebe5;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: #76543d;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 32px;
+        line-height: 1.2;
+      }
+
+      .copy {
+        color: #66574c;
+        line-height: 1.7;
+      }
+
+      .price {
+        margin: 18px 0;
+        color: #5b3a27;
+        font-size: 24px;
+        font-weight: 900;
+      }
+
+      .productOption {
+        margin: 22px 0 16px;
+        padding: 18px;
+        border: 1px solid #eadfd5;
+        border-radius: 10px;
+        background: #fffaf6;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      select {
+        width: 100%;
+        height: 44px;
+        border: 1px solid #d8c9bd;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-size: 14px;
+        background: #fff;
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      button {
+        border: 0;
+        border-radius: 8px;
+        padding: 13px 18px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      #actionBuy {
+        color: #fff;
+        background: #201610;
+      }
+
+      #actionCart {
+        color: #201610;
+        background: #eadfd5;
+      }
+
+      .detail {
+        margin-top: 36px;
+        padding: 36px;
+        border-radius: 12px;
+        background: #fff;
+        line-height: 1.8;
+      }
+
+      @media (max-width: 760px) {
+        .product {
+          grid-template-columns: 1fr;
+          padding: 20px;
+        }
+
+        h1 {
+          font-size: 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="product xans-product-detail" data-product-no="330">
+        <img
+          class="product-image"
+          src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg"
+          alt="[슬립앤슬립] 깊은잠베개"
+        />
+        <div>
+          <p class="eyebrow">SleepFit AI 데모</p>
+          <h1>[슬립앤슬립] 깊은잠베개</h1>
+          <p class="copy">
+            수면 자세와 체형에 맞춰 S/M 옵션을 선택해야 하는 대표 상품입니다. SleepFit AI는 자동 장바구니 담기 대신 추천
+            근거를 보여주고 옵션 영역으로 부드럽게 연결합니다.
+          </p>
+          <div id="span_product_price_text" class="price">94,900원</div>
+          <div id="optionG" class="productOption">
+            <label for="product_option_id1">옵션 선택</label>
+            <select id="product_option_id1">
+              <option>- [필수] 옵션을 선택해 주세요 -</option>
+              <option>S사이즈</option>
+              <option>M사이즈 (+4,000원)</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button id="actionBuy" type="button">바로 구매</button>
+            <button id="actionCart" type="button">장바구니</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="detail">
+        <h2>상품 상세 영역</h2>
+        <p>
+          실제 카페24 상세 페이지에서는 긴 이미지 상세와 리뷰, Q&A가 이어집니다. 데모에서는 옵션 스크롤과 장바구니 클릭
+          이벤트 수집을 확인하기 위한 최소 구조만 둡니다.
+        </p>
+      </section>
+    </main>
+
+    <script async src="/sleepfit.js" data-mall-id="sleepnsleepmall" data-debug="true"></script>
+  </body>
+</html>

@@ -8,6 +8,7 @@ node_modules
 coverage
 build
 out
+dist
 
 npm-debug.log*
 yarn-debug.log*
@@ -20,3 +21,4 @@ temp-*.log
 .tmp/
 
 cloudflared.exe
+tools/sanggyu-work-alarm

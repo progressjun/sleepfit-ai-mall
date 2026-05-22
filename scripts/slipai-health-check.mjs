@@ -303,6 +303,54 @@ async function checkScopeGuardChat() {
     /코딩|답변하지 않습니다|쇼핑몰/.test(compatMessage),
     compatMessage.slice(0, 160),
   );
+
+  const unsupportedProduct = await fetchJson("/api/onsite/chat", {
+    projectKey,
+    mallId,
+    visitorId,
+    sessionId,
+    message: "멀티비타민 구매하고 싶은데, 뭘 봐야할까요?",
+    page,
+    product,
+  });
+  const unsupportedMessage = unsupportedProduct.json?.data?.message || "";
+  record(
+    "chat unsupported product status",
+    unsupportedProduct.response.ok,
+    `${unsupportedProduct.response.status} ${unsupportedProduct.text.slice(0, 120)}`,
+  );
+  record(
+    "chat unsupported product guarded",
+    unsupportedProduct.json?.source === "guard" && /확인하지 못했어요|상품 정보/.test(unsupportedMessage),
+    unsupportedMessage.slice(0, 180),
+  );
+  record(
+    "chat no generic category checklist",
+    !/성분표|권장\s*섭취|타깃|카테고리|비타민\s*A|비타민\s*B|비타민\s*C/.test(unsupportedMessage),
+    unsupportedMessage.slice(0, 180),
+  );
+  record("chat unsupported product no mojibake", !hasMojibake(unsupportedMessage), unsupportedMessage.slice(0, 120));
+
+  const compatUnsupported = await fetchJson("/api/chat", {
+    siteId: mallId,
+    visitorId,
+    sessionId,
+    message: "멀티비타민 구매하고 싶은데, 뭘 봐야할까요?",
+    pageUrl: page.url,
+    productContext: product,
+  });
+  const compatUnsupportedMessage = compatUnsupported.json?.answer || "";
+  record("compat unsupported product status", compatUnsupported.response.ok, `${compatUnsupported.response.status} ${compatUnsupported.text.slice(0, 120)}`);
+  record(
+    "compat unsupported product guarded",
+    compatUnsupported.json?.source === "guard" && /확인하지 못했어요|상품 정보/.test(compatUnsupportedMessage),
+    compatUnsupportedMessage.slice(0, 180),
+  );
+  record(
+    "compat no generic category checklist",
+    !/성분표|권장\s*섭취|타깃|카테고리|비타민\s*A|비타민\s*B|비타민\s*C/.test(compatUnsupportedMessage),
+    compatUnsupportedMessage.slice(0, 180),
+  );
 }
 
 async function checkAiRecommendations() {

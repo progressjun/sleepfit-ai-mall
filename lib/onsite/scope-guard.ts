@@ -17,7 +17,7 @@ const blockedTerms: Array<RegExp> = [
 
 const productIntents: Array<RegExp> = [
   /\b(product|item|price|shipping|delivery|exchange|return|refund|order|purchase|review|option|coupon|cart|size|color|material|fabric|fit|brand|category|checkout)\b/i,
-  /상품|사이즈|가격|배송|리뷰|후기|옵션|장바구니|색상|소재|교환|반품|환불|구매|결제|브랜드|코디|착용|핏|재질/i,
+  /상품|사이즈|가격|배송|리뷰|후기|옵션|장바구니|색상|소재|핏|교환|반품|환불|구매|결제|브랜드|코디|착용|성분|섭취|복용|카테고리/i,
 ];
 
 function normalizeMessage(value: string) {
@@ -65,16 +65,14 @@ function createRefusalMessage(productName?: string, products: OnsiteProductSourc
       "비슷한 상품과 어떻게 비교하면 좋을까요?",
       "좋은 후기 중심으로 보여주세요.",
     ],
-    products: [
-      {
-        productNo: products[0]?.productNo == null ? null : String(products[0].productNo),
-        name: products[0]?.name || fallbackName,
-        reason: "이 쇼핑몰 범위 안에서 안내할 수 있는 기준 상품입니다.",
-        priceText: products[0]?.priceText ?? null,
-        imageUrl: products[0]?.imageUrl ?? null,
-        url: products[0]?.url ?? null,
-      },
-    ],
+    products: products.slice(0, 1).map((product) => ({
+      productNo: product.productNo == null ? null : String(product.productNo),
+      name: product.name,
+      reason: "이 쇼핑몰 범위 안에서 안내할 수 있는 기준 상품입니다.",
+      priceText: product.priceText ?? null,
+      imageUrl: product.imageUrl ?? null,
+      url: product.url ?? null,
+    })),
     cta: {
       label: "상품 상담하기",
       action: "open_chat" as const,
@@ -83,6 +81,6 @@ function createRefusalMessage(productName?: string, products: OnsiteProductSourc
   };
 }
 
-export function createScopedChatRefusal(product?: OnsiteProductSource) {
-  return createRefusalMessage(product?.name, product ? [product] : []);
+export function createScopedChatRefusal(product?: OnsiteProductSource, products: OnsiteProductSource[] = []) {
+  return createRefusalMessage(product?.name, products.length > 0 ? products : product ? [product] : []);
 }

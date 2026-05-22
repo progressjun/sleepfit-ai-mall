@@ -28,6 +28,8 @@
 - Improved product-detail dwell recommendation reliability with a safety timer and added debug-only state attributes for local QA.
 - Raised demo-only frequency caps/cooldowns so repeated visual QA does not hide the recommendation banner after the normal shopper frequency cap is reached.
 - Expanded the health check to assert product-card image fallback and client-side current-product dedupe guards.
+- Hardened onsite chat so unsupported product/category questions, such as asking for multivitamins on a mall where that category is not in the collected catalog, are blocked before OpenAI and never return generic buying checklists.
+- Cleaned onsite chat scope/prompt copy and added health-check assertions for installed-mall-only Korean chat answers.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

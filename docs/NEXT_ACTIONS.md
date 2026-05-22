@@ -19,6 +19,7 @@
 12. Before adding a generic campaign manager, design persistence/auth/permission boundaries for campaign tables instead of adding ad-hoc DB schema.
 13. Add a visual regression smoke check that asserts onsite product cards have no current-product duplicates, no collapsed text columns, and either a real image or the SlipAI placeholder.
 14. Promote the current Browser DOM-based visual assertions into an automated local smoke script so screenshot capture timeouts do not block regression checks.
+15. Replace the keyword-based unsupported-category guard with catalog-backed product/category indexing once crawler persistence is in place, so nutrition, apparel, and other verticals can be matched from real collected products instead of a small term list.
 
 ## Priority 2
 1. Add observability counters in logs for crawl queue depth, error reasons, robots block ratio.

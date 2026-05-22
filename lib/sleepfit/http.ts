@@ -13,7 +13,12 @@ interface RateLimitResult {
   windowMs: number;
 }
 
-const DEFAULT_ALLOWED_ORIGINS = ["https://sleepnsleepmall.com", "https://sleepnsleepmall.co.kr"];
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://sleepnsleepmall.com",
+  "https://www.sleepnsleepmall.com",
+  "https://sleepnsleepmall.co.kr",
+  "https://www.sleepnsleepmall.co.kr",
+];
 const buckets = new Map<string, RateLimitState>();
 const MAX_BUCKETS = 20_000;
 

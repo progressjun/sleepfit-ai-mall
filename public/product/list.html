@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SleepFit AI 스모크 | Cafe24 카테고리 경로</title>
+    <style>
+      body {
+        margin: 0;
+        font-family:
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          "Noto Sans KR",
+          sans-serif;
+        color: #201610;
+        background: #f7f3ef;
+      }
+
+      main {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 44px 20px 160px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: 32px;
+      }
+
+      p {
+        color: #66574c;
+        line-height: 1.6;
+      }
+
+      .mock-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .item {
+        border: 1px solid #e4d9cf;
+        border-radius: 10px;
+        background: #fff;
+        overflow: hidden;
+      }
+
+      .item img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+      }
+
+      .item div {
+        padding: 14px;
+        font-weight: 900;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>베개 카테고리</h1>
+      <p>실제 카페24 카테고리와 같은 <code>/product/list.html?cate_no=45</code> 경로 판별을 확인하는 스모크 페이지입니다.</p>
+      <section class="mock-list">
+        <article class="item" data-product-no="330">
+          <img
+            src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg"
+            alt="[슬립앤슬립] 깊은잠베개"
+          />
+          <div>[슬립앤슬립] 깊은잠베개</div>
+        </article>
+        <article class="item" data-product-no="345">
+          <img
+            src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202410/4c2883d241621aed34f65b29e2962bc9.jpg"
+            alt="[슬립앤슬립] 와이드핏 베개"
+          />
+          <div>[슬립앤슬립] 와이드핏 베개</div>
+        </article>
+        <article class="item" data-product-no="36">
+          <img
+            src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202402/675a7c807e6e683d7aac7024d1ffdca5.jpg"
+            alt="[슬립앤슬립] 리얼 오가닉 베개"
+          />
+          <div>[슬립앤슬립] 리얼 오가닉 베개</div>
+        </article>
+      </section>
+    </main>
+
+    <script async src="/sleepfit.js" data-mall-id="sleepnsleepmall" data-debug="true"></script>
+  </body>
+</html>

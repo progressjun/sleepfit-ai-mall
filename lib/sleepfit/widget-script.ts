@@ -1,3 +1,5 @@
+import { SLEEPFIT_VERSION } from "@/lib/sleepfit/version";
+
 export function buildSleepfitWidgetScript() {
   return `
 (function () {
@@ -5,7 +7,7 @@ export function buildSleepfitWidgetScript() {
 
   if (window.sleepfitAI && window.sleepfitAI.version) return;
 
-  var VERSION = "0.1.0";
+  var VERSION = "${SLEEPFIT_VERSION}";
   var BRAND = "SleepFit AI";
   var script =
     document.currentScript ||
@@ -17,6 +19,11 @@ export function buildSleepfitWidgetScript() {
   var mallId = script.getAttribute("data-mall-id") || "sleepnsleepmall";
   var debug = script.getAttribute("data-debug") === "true";
   var apiBase = script.getAttribute("data-api-base") || new URL(script.src, window.location.href).origin;
+  var disabled = script.getAttribute("data-disabled") === "true";
+  var surfaceConfig = script.getAttribute("data-surfaces") || "home,collection,product_detail";
+  var forceSurface = script.getAttribute("data-surface") || "auto";
+  var position = script.getAttribute("data-position") || "right";
+  var autoOpen = script.getAttribute("data-auto-open") || "product";
 
   function log(message, details) {
     if (!debug || !window.console) return;
@@ -36,6 +43,44 @@ export function buildSleepfitWidgetScript() {
     try {
       storage.setItem(key, value);
     } catch (_) {}
+  }
+
+  function csv(value) {
+    return String(value || "")
+      .split(",")
+      .map(function (item) {
+        return item.trim().toLowerCase();
+      })
+      .filter(Boolean);
+  }
+
+  function normalizeSurface(value) {
+    var surface = String(value || "").trim().toLowerCase();
+    if (!surface || surface === "auto") return "";
+    if (surface === "product" || surface === "detail") return "product_detail";
+    if (surface === "category" || surface === "list" || surface === "search") return "collection";
+    if (surface === "main") return "home";
+    if (surface === "basket") return "cart";
+    if (surface === "order") return "checkout";
+    if (surface === "none" || surface === "off") return "hidden";
+    return surface;
+  }
+
+  function shouldRenderSurface(pageType) {
+    if (disabled) return false;
+    if (pageType === "cart" || pageType === "checkout" || pageType === "hidden") return false;
+    var allowed = csv(surfaceConfig).map(function (item) {
+      return normalizeSurface(item) || item;
+    });
+    if (allowed.indexOf("*") !== -1 || allowed.indexOf("all") !== -1) return true;
+    return allowed.indexOf(pageType) !== -1;
+  }
+
+  function shouldAutoOpen(pageType) {
+    var mode = String(autoOpen || "product").trim().toLowerCase();
+    if (mode === "false" || mode === "never" || mode === "off") return false;
+    if (mode === "true" || mode === "always" || mode === "all") return true;
+    return pageType === "product_detail";
   }
 
   function createId(prefix) {
@@ -89,7 +134,13 @@ export function buildSleepfitWidgetScript() {
     var queryNo = params.get("product_no") || params.get("productNo") || params.get("product_id");
     if (queryNo) return queryNo;
 
-    var datasetNode = document.querySelector("[data-product-no], [data-product-id], [ec-data-product-no]");
+    var detailScope = document.querySelector(".xans-product-detail, .detailArea, .infoArea");
+    var datasetNode = null;
+    if (detailScope) {
+      datasetNode = detailScope.matches("[data-product-no], [data-product-id], [ec-data-product-no]")
+        ? detailScope
+        : detailScope.querySelector("[data-product-no], [data-product-id], [ec-data-product-no]");
+    }
     if (datasetNode) {
       return (
         datasetNode.getAttribute("data-product-no") ||
@@ -130,13 +181,20 @@ export function buildSleepfitWidgetScript() {
   function detectPageType(productNo) {
     var pathname = window.location.pathname || "/";
     var lowerPath = pathname.toLowerCase();
-    if (productNo || /\\/product\\//i.test(pathname) || /product_no=/i.test(window.location.search)) return "product_detail";
-    if (lowerPath === "/" || lowerPath === "/index.html" || lowerPath === "/index.htm") return "home";
-    if (/\\/(category|collection|collections|search|shop|list)\\b/i.test(lowerPath) || /cate_no=|category_no=|keyword=/i.test(window.location.search)) {
-      return "collection";
-    }
     if (/\\/(cart|basket)\\b/i.test(lowerPath)) return "cart";
     if (/\\/(order|checkout)\\b/i.test(lowerPath)) return "checkout";
+    if (/\\/(member|myshop|login|join|account)\\b/i.test(lowerPath)) return "other";
+    if (lowerPath === "/" || lowerPath === "/index.html" || lowerPath === "/index.htm") return "home";
+    if (
+      /\\/product\\/(list|search)\\.html/i.test(lowerPath) ||
+      /\\/(category|collection|collections|search|shop|list)\\b/i.test(lowerPath) ||
+      /cate_no=|category_no=|keyword=/i.test(window.location.search)
+    ) {
+      return "collection";
+    }
+    if (productNo || /\\/product\\/detail\\.html/i.test(lowerPath) || /\\/product\\/(?:[^/]+\\/)?[0-9]+(?:\\/|$)/i.test(pathname)) {
+      return "product_detail";
+    }
     return "other";
   }
 
@@ -151,6 +209,10 @@ export function buildSleepfitWidgetScript() {
     var price =
       firstText(["#span_product_price_text", ".xans-product-detail .price", ".product_price", ".price"]) ||
       getMeta("product:price:amount");
+
+    var forcedPageType = normalizeSurface(forceSurface);
+    if (forcedPageType) pageType = forcedPageType;
+    if (pageType !== "product_detail") productNo = "";
 
     return {
       pageType: pageType,
@@ -272,9 +334,34 @@ export function buildSleepfitWidgetScript() {
   var opened = false;
   var recommendation = null;
 
+  function exposeDisabled(reason, product) {
+    window.sleepfitAI = {
+      version: VERSION,
+      brand: BRAND,
+      disabled: true,
+      reason: reason,
+      open: function () {
+        log("open skipped", reason);
+      },
+      close: function () {},
+      track: function () {},
+      getState: function () {
+        return {
+          version: VERSION,
+          mallId: mallId,
+          disabled: true,
+          reason: reason,
+          product: product || detectProduct(),
+        };
+      },
+    };
+    log("disabled", window.sleepfitAI.getState());
+  }
+
   function createHost(product) {
     var host = document.createElement("div");
     host.setAttribute("data-sleepfit-host", "true");
+    host.setAttribute("data-sleepfit-surface", product.pageType);
 
     if (product.pageType === "product_detail") {
       host.style.display = "block";
@@ -293,8 +380,9 @@ export function buildSleepfitWidgetScript() {
       }
     } else {
       host.style.position = "fixed";
-      host.style.right = "18px";
-      host.style.bottom = "18px";
+      if (position === "left") host.style.left = "18px";
+      else host.style.right = "18px";
+      host.style.bottom = "calc(18px + env(safe-area-inset-bottom, 0px))";
       host.style.zIndex = "2147483001";
       host.style.maxWidth = "calc(100vw - 28px)";
       host.setAttribute("role", "button");
@@ -308,6 +396,11 @@ export function buildSleepfitWidgetScript() {
   }
 
   var product = detectProduct();
+  if (!shouldRenderSurface(product.pageType)) {
+    exposeDisabled(disabled ? "data-disabled" : "surface:" + product.pageType, product);
+    return;
+  }
+
   var host = createHost(product);
   var shadow = host.attachShadow({ mode: "open" });
 
@@ -585,8 +678,10 @@ export function buildSleepfitWidgetScript() {
       });
     }
 
-    if (product.pageType === "product_detail") {
+    if (shouldAutoOpen(product.pageType)) {
       openPanel();
+    } else if (root.classList.contains("inline")) {
+      renderQuestion();
     }
 
     window.sleepfitAI = {

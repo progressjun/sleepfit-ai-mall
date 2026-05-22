@@ -61,6 +61,7 @@ SleepFit v1.1은 OpenAI 키 없이 동작합니다. 공개 상품 정보, 수동
 배포 후 아래 URL을 확인합니다.
 
 - `https://sleepfit-ai-mall.vercel.app/api/sleepfit/health`
+- `https://sleepfit-ai-mall.vercel.app/sleepfit-home-demo.html`
 - `https://sleepfit-ai-mall.vercel.app/sleepfit-category-demo.html`
 - `https://sleepfit-ai-mall.vercel.app/product/list.html?cate_no=45`
 - `https://sleepfit-ai-mall.vercel.app/sleepfit-demo.html`

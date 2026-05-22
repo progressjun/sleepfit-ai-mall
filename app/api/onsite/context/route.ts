@@ -252,12 +252,12 @@ function buildContext({
       ];
 
   return {
-    advisorTitle: ko("SlipAI \uC0C1\uB2F4\uC0AC"),
+    advisorTitle: ko("SlipAI 추천"),
     greeting,
     placeholder,
     secondaryCta: isProductDetail
-      ? ko("\uC774 \uC0C1\uD488 \uC0C1\uB2F4\uD558\uAE30")
-      : ko("\uB0B4\uAC8C \uB9DE\uB294 \uC0C1\uD488 \uCC3E\uAE30"),
+      ? ko("추천 이유 보기")
+      : ko("후기 많은 상품 보기"),
     focusLabels: focus,
     quickQuestions,
     products: candidates.slice(0, 3).map(toPublicProduct),

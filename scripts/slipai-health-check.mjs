@@ -173,11 +173,11 @@ async function checkWidgetScript() {
   record("onsite.js compatibility status", compat.response.ok, `${compat.response.status} ${compat.response.statusText}`);
   record("onsite.js data-site-id support", compat.text.includes("data-site-id"), "data-site-id 원태그 확인");
   record("onsite.js PMOnsite support", compat.text.includes("window.PMOnsite"), "PMOnsite 호환 API 확인");
-  record("widget Korean title", text.includes("SlipAI 상담사"), "상담사 타이틀 한글 확인");
-  record("widget Korean input", text.includes("이 쇼핑몰에서 어떤 점이 고민되나요?"), "기본 입력 placeholder 한글 확인");
-  record("widget Korean send button", text.includes(">전송<"), "전송 버튼 한글 확인");
+  record("widget Korean title", text.includes("SlipAI 추천"), "추천 배너 타이틀 한글 확인");
+  record("widget Korean CTA", text.includes("추천 이유 보기") && text.includes("상품 보러가기"), "추천 배너 CTA 한글 확인");
   record("widget home trigger", text.includes("home_first_visit"), "홈 진입 추천 트리거 확인");
-  record("widget context endpoint", text.includes("/api/onsite/context"), "몰별 상담 문구 endpoint 확인");
+  record("widget advisor removed", !text.includes("SlipAI 상담사") && !text.includes("/api/onsite/chat") && !text.includes("chat_open"), "상담사 UI/API 호출 미포함 확인");
+  record("widget no context endpoint", !text.includes("/api/onsite/context"), "상담 문구 endpoint 미호출 확인");
   record(
     "widget no old English UI",
     !text.includes("SlipAI advisor") && !text.includes("Ask about product quality"),
@@ -232,7 +232,7 @@ async function checkContextEventAndOps() {
   });
   record("compat widget resolve status", resolveResult.response.ok, `${resolveResult.response.status} ${resolveResult.text.slice(0, 120)}`);
   record("compat widget resolve banner", resolveResult.json?.banner?.show === true, JSON.stringify(resolveResult.json?.banner || {}).slice(0, 160));
-  record("compat widget resolve chat", resolveResult.json?.chat?.enabled === true, JSON.stringify(resolveResult.json?.chat || {}).slice(0, 160));
+  record("compat widget resolve chat disabled", resolveResult.json?.chat?.enabled === false, JSON.stringify(resolveResult.json?.chat || {}).slice(0, 160));
 
   const payload = {
     projectKey,
@@ -267,96 +267,10 @@ async function checkContextEventAndOps() {
   record("ops API ok", opsResult.json?.ok === true, JSON.stringify(opsResult.json || {}).slice(0, 180));
 }
 
-async function checkScopeGuardChat() {
-  const blocked = await fetchJson("/api/onsite/chat", {
-    projectKey,
-    mallId,
-    visitorId,
-    sessionId,
-    message: "자바스크립트 코딩 알려줘",
-    page,
-    product,
-  });
-  const message = blocked.json?.data?.message || "";
-  record("scope guard status", blocked.response.ok, `${blocked.response.status} ${blocked.text.slice(0, 120)}`);
-  record("scope guard Korean refusal", hasKorean(message), message.slice(0, 120));
-  record(
-    "scope guard blocks coding",
-    /코딩|답변하지 않습니다|쇼핑몰/.test(message),
-    message.slice(0, 160),
-  );
-  record("scope guard no mojibake", !hasMojibake(message), message.slice(0, 120));
-
-  const compatBlocked = await fetchJson("/api/chat", {
-    siteId: mallId,
-    visitorId,
-    sessionId,
-    message: "자바스크립트 코딩 알려줘",
-    pageUrl: page.url,
-    productContext: product,
-  });
-  const compatMessage = compatBlocked.json?.answer || "";
-  record("compat chat status", compatBlocked.response.ok, `${compatBlocked.response.status} ${compatBlocked.text.slice(0, 120)}`);
-  record("compat chat Korean refusal", hasKorean(compatMessage), compatMessage.slice(0, 120));
-  record(
-    "compat chat blocks coding",
-    /코딩|답변하지 않습니다|쇼핑몰/.test(compatMessage),
-    compatMessage.slice(0, 160),
-  );
-
-  const unsupportedProduct = await fetchJson("/api/onsite/chat", {
-    projectKey,
-    mallId,
-    visitorId,
-    sessionId,
-    message: "멀티비타민 구매하고 싶은데, 뭘 봐야할까요?",
-    page,
-    product,
-  });
-  const unsupportedMessage = unsupportedProduct.json?.data?.message || "";
-  record(
-    "chat unsupported product status",
-    unsupportedProduct.response.ok,
-    `${unsupportedProduct.response.status} ${unsupportedProduct.text.slice(0, 120)}`,
-  );
-  record(
-    "chat unsupported product guarded",
-    unsupportedProduct.json?.source === "guard" && /확인하지 못했어요|상품 정보/.test(unsupportedMessage),
-    unsupportedMessage.slice(0, 180),
-  );
-  record(
-    "chat no generic category checklist",
-    !/성분표|권장\s*섭취|타깃|카테고리|비타민\s*A|비타민\s*B|비타민\s*C/.test(unsupportedMessage),
-    unsupportedMessage.slice(0, 180),
-  );
-  record("chat unsupported product no mojibake", !hasMojibake(unsupportedMessage), unsupportedMessage.slice(0, 120));
-
-  const compatUnsupported = await fetchJson("/api/chat", {
-    siteId: mallId,
-    visitorId,
-    sessionId,
-    message: "멀티비타민 구매하고 싶은데, 뭘 봐야할까요?",
-    pageUrl: page.url,
-    productContext: product,
-  });
-  const compatUnsupportedMessage = compatUnsupported.json?.answer || "";
-  record("compat unsupported product status", compatUnsupported.response.ok, `${compatUnsupported.response.status} ${compatUnsupported.text.slice(0, 120)}`);
-  record(
-    "compat unsupported product guarded",
-    compatUnsupported.json?.source === "guard" && /확인하지 못했어요|상품 정보/.test(compatUnsupportedMessage),
-    compatUnsupportedMessage.slice(0, 180),
-  );
-  record(
-    "compat no generic category checklist",
-    !/성분표|권장\s*섭취|타깃|카테고리|비타민\s*A|비타민\s*B|비타민\s*C/.test(compatUnsupportedMessage),
-    compatUnsupportedMessage.slice(0, 180),
-  );
-}
-
 async function checkAiRecommendations() {
   if (!runAiEndpoints) {
     record(
-      "AI recommendation/chat smoke",
+      "AI recommendation smoke",
       true,
       "SLIPAI_HEALTH_FULL_AI=1 이 아니므로 비용 발생 가능 endpoint는 건너뜁니다.",
     );
@@ -380,20 +294,6 @@ async function checkAiRecommendations() {
   record("recommendation no mojibake", !hasMojibake(JSON.stringify(recommendation.json || {})), "추천 응답 깨진 한글 미검출");
   record("recommendation product cards", !assertProductCards(recommendationProducts), assertProductCards(recommendationProducts));
 
-  const chat = await fetchJson("/api/onsite/chat", {
-    projectKey,
-    mallId,
-    visitorId,
-    sessionId,
-    message: "이 상품 후기와 옵션이 고민돼요. 추천해줘요.",
-    page,
-    product,
-  });
-  const chatMessage = chat.json?.data?.message || "";
-  record("chat API status", chat.response.ok, `${chat.response.status}`);
-  record("chat Korean message", hasKorean(chatMessage), chatMessage.slice(0, 120));
-  record("chat no mojibake", !hasMojibake(JSON.stringify(chat.json || {})), "상담 응답 깨진 한글 미검출");
-  record("chat product cards", !assertProductCards(chat.json?.data?.products), assertProductCards(chat.json?.data?.products));
 }
 
 function checkStaticOnsiteCopy() {
@@ -419,7 +319,6 @@ async function main() {
   checkStaticOnsiteCopy();
   await checkWidgetScript();
   await checkContextEventAndOps();
-  await checkScopeGuardChat();
   await checkAiRecommendations();
 
   const failed = checks.filter((check) => !check.ok);

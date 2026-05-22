@@ -88,30 +88,29 @@ export async function POST(request: Request) {
         campaignId: isProductDetail ? "slipai_product_recommendation" : "slipai_shopping_guide",
         bannerType: "bottom_floating",
         position: "bottom-right",
-        title: isProductDetail ? "리뷰 보고 결정해보세요" : "첫 방문 쇼핑가이드",
+        title: isProductDetail ? "후기 많은 상품 추천" : "리뷰 기반 추천",
         description:
           json.data.greeting ||
           (isProductDetail
-            ? "상품 정보와 후기를 기준으로 비교하기 좋은 상품을 보여드릴게요."
-            : "많이 살펴보는 상품과 리뷰 반응이 좋은 상품부터 안내드릴게요."),
+            ? "이 쇼핑몰에서 후기가 많이 모인 상품을 추천드릴게요."
+            : "리뷰 수와 리뷰 내용을 기준으로 먼저 보기 좋은 상품을 보여드릴게요."),
         imageUrl,
-        ctaText: isProductDetail ? "비슷한 상품 보기" : "상품 추천 받기",
+        ctaText: "추천 상품 보러가기",
         clickUrl,
         trigger: triggerFor(product.pageType),
         products,
         disclosure:
-          json.data.disclosure || "SlipAI는 이 쇼핑몰에서 확인한 상품과 후기 기준으로 안내합니다.",
+          json.data.disclosure || "SlipAI는 이 쇼핑몰에서 수집된 상품과 리뷰 정보를 기준으로 추천합니다.",
       },
       chat: {
-        enabled: true,
-        assistantName: "SlipAI 상담사",
+        enabled: false,
+        assistantName: "",
         position: "bottom-right",
-        initialMessage:
-          json.data.greeting || "어떤 부분이 고민되나요? 이 쇼핑몰의 상품과 후기 기준으로 도와드릴게요.",
-        placeholder: json.data.placeholder || "궁금한 내용을 입력해 주세요.",
+        initialMessage: "",
+        placeholder: "",
         cta: {
-          enabled: true,
-          label: json.data.secondaryCta || "상담 시작하기",
+          enabled: false,
+          label: "",
           url: clickUrl,
         },
       },

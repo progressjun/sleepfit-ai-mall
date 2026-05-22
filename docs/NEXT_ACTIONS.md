@@ -14,12 +14,13 @@
 7. Add an automated smoke check for the menu-free `/website` install ops screen.
 8. Verify crawler behavior on a real Cafe24 staging mall with multiple product detail URL formats.
 9. Add a small support checklist for confirming card click-through URLs and image extraction quality after install.
-10. Keep crawler smoke-test artifacts fresh after each rollout and verify banner + chat open + recommendation response after dwell.
+10. Keep crawler smoke-test artifacts fresh after each rollout and verify banner impression, product image/card click-through, and review-count recommendation response after dwell.
 11. For feature updates, ship through PR -> Vercel Preview -> Production merge so installed storefronts pick up the stable `/onsite.js` or `/widget/v1.js` release automatically.
 12. Before adding a generic campaign manager, design persistence/auth/permission boundaries for campaign tables instead of adding ad-hoc DB schema.
 13. Add a visual regression smoke check that asserts onsite product cards have no current-product duplicates, no collapsed text columns, and either a real image or the SlipAI placeholder.
 14. Promote the current Browser DOM-based visual assertions into an automated local smoke script so screenshot capture timeouts do not block regression checks.
-15. Replace the keyword-based unsupported-category guard with catalog-backed product/category indexing once crawler persistence is in place, so nutrition, apparel, and other verticals can be matched from real collected products instead of a small term list.
+15. Replace the keyword-based legacy chat guard with catalog-backed product/category indexing only if chat compatibility is re-enabled later.
+16. Add review-count observability to the operator screen so the top-recommended product and its collected review count are visible per installed mall.
 
 ## Priority 2
 1. Add observability counters in logs for crawl queue depth, error reasons, robots block ratio.

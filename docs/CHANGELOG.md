@@ -30,6 +30,9 @@
 - Expanded the health check to assert product-card image fallback and client-side current-product dedupe guards.
 - Hardened onsite chat so unsupported product/category questions, such as asking for multivitamins on a mall where that category is not in the collected catalog, are blocked before OpenAI and never return generic buying checklists.
 - Cleaned onsite chat scope/prompt copy and added health-check assertions for installed-mall-only Korean chat answers.
+- Removed the visible onsite AI 상담사 widget from the storefront loader and converted SlipAI to a banner-only experience.
+- Changed onsite recommendations to prioritize the same-mall product with the most collected reviews and explain the recommendation reason from review count/review content.
+- Updated widget/compat health checks so they assert chat is disabled and the stable script shows only Korean recommendation banner UI.
 
 ### 2026-05-19
 - Added on-site crawler onboarding flow:

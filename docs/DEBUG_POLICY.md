@@ -1,36 +1,36 @@
-# 디버그 정책
+# Debug Policy
 
-## 1. 기본 원칙
-1. 재현 가능한 증상 먼저 확보
-2. 최소 변경으로 원인 분리
-3. 환경변수/권한 이슈 먼저 점검
-4. 본질이 아닌 UI만의 변경으로 번복하지 않음
+## Priorities
+1. Script load failures or missing widget namespace.
+2. API 400/401/429/500 errors from onsite endpoints.
+3. Recommendation banner not showing after home delay or product dwell.
+4. Product cards missing images, names, reasons, or click-through URLs when the crawler has them.
+5. Broken Korean/mojibake or old English UI copy.
+6. Chat/advisor UI accidentally reappearing in the storefront widget.
 
-## 2. 재현 우선순위
-1. 라우트 500/400 응답 (콘솔 및 네트워크 탭)
-2. 위젯 미노출 (스크립트 삽입/도메인/토큰)
-3. 추천 미표시 (상품 상세 30초 체류 시)
-4. 상담 응답 품질/범위 이탈
+## First Checks
+- `git status --short --branch`
+- `npm.cmd run verify`
+- `node scripts\slipai-health-check.mjs`
+- Public deployment check with `SLIPAI_HEALTH_BASE_URL` when Vercel is live.
 
-## 3. 체크 항목
-- 서버 상태: `npm run dev` 또는 `npm run start` 실행 로그
-- API 로그: `/api/onsite/events`, `/api/onsite/recommendation`, `/api/onsite/chat`
-- 브라우저 로그:
-  - 스크립트 실행 에러
-  - `__C24AI`/`__SLIPAI` 객체 존재 여부
-  - 이벤트 payload 생성 여부
-- 환경 변수:
-  - `ONSITE_WIDGET_SHARED_SECRET` 존재/미존재 시 동작 분기
-  - `ONSITE_WIDGET_ALLOWED_ORIGINS` 설정
+## Browser Checks
+- `window.__SLIPAI.getState()` exists.
+- Banner appears on home/list pages after the proactive delay.
+- Banner appears on product detail pages after dwell.
+- Banner product cards show a product image or SlipAI placeholder.
+- Product card click navigates to the product URL when available.
+- No AI 상담사 launcher, chat panel, chat input, or chat open event is produced by the installed widget.
 
-## 4. 수집해야 할 정보
-- 발생 시간/브라우저 UA
-- 페이지 타입(product detail / other)
-- 요청 payload의 `projectKey`, `mallId`, `eventName`(혹은 `message`)
-- `response.ok` 여부 및 응답 메시지
+## Safe Automatic Fixes
+- Clear import/type/build errors.
+- Repair broken Korean copy.
+- Fix deterministic product-card rendering issues.
+- Add or update health checks for regression coverage.
 
-## 5. 임시 완화
-- 위젯 동작이 핵심 영업 이슈일 때:
-  1. 관리자 페이지에서 스크립트 삽입 비활성
-  2. 운영자 브라우저 캐시/쿠키 초기화
-  3. 핵심 스크립트 재삽입 후 5분 단위로 재확인
+## Proposal-Only Areas
+- API key handling.
+- Authentication and authorization.
+- Database schema changes.
+- Payment, privacy, ad-consent, or legal policy changes.
+- Broad UI redesigns.

@@ -1,107 +1,60 @@
-# SlipAI One-Tag Onsite Architecture
+# SlipAI One-Tag Architecture
 
-## Core Principle
-
-SlipAI is not a hardcoded banner component that each advertiser edits inside their storefront.
-The storefront installs one small loader script, and SlipAI servers decide what to show, when to
-show it, what product/review evidence to use, and how to record impressions, clicks, closes, chats,
-and conversions.
+SlipAI is a lightweight storefront SDK plus server-side recommendation system.
+The storefront installs one stable script; the server decides which review-based product banner to show.
 
 ```html
 <script async src="https://slipai-test-kr.vercel.app/onsite.js" data-site-id="brand_mall_id"></script>
 ```
 
-The lower-level SlipAI install still supports explicit project and mall keys when a brand needs a
-shared secret or custom project mapping:
-
-```html
-<script>
-  window.slipai =
-    window.slipai ||
-    function () {
-      (window.slipai.q = window.slipai.q || []).push(arguments);
-    };
-
-  window.slipai("init", {
-    projectKey: "pk_brand_key",
-    mallId: "brand_mall_id",
-    dwellSeconds: 30
-  });
-</script>
-<script async src="https://slipai-test-kr.vercel.app/widget/v1.js"></script>
-```
-
-The script is the executor. The server is the decision layer. The operator screen is the control
-center. Product/review data and AI responses stay server-side; OpenAI API keys never go into the
-browser.
-
 ## Runtime Flow
 
 ```text
-Advertiser storefront
-  -> /onsite.js or /widget/v1.js loader
-  -> anonymous SlipAI visitor/session id
-  -> page/product/discovery/event payloads
-  -> /api/widget/resolve compatibility config
-  -> /api/events compatibility tracking
-  -> /api/chat compatibility AI proxy
-  -> /api/onsite/context
-  -> /api/onsite/recommendation
-  -> /api/onsite/chat
-  -> /api/onsite/events
-  -> Shadow DOM banner/advisor UI
+Storefront
+  -> /onsite.js or /widget/v1.js
+  -> collect anonymous visitor/session/page/product context
+  -> send page_view and discovery URLs
+  -> /api/onsite/discovery queues same-domain URLs
+  -> crawler extracts products, images, and reviews
+  -> /api/onsite/recommendation returns the most-reviewed same-mall product banner
+  -> Shadow DOM renders the banner and product cards
+  -> impression/click/close events are recorded
 ```
 
-## Loader Responsibilities
+## Storefront Responsibilities
 
-- Read `siteId` from the one-line install, or `projectKey`, `mallId`, optional `widgetToken`,
-  and trigger settings from the advanced init snippet.
-- Create SlipAI-owned anonymous IDs in `localStorage` and `sessionStorage`.
-- Collect page URL, referrer, viewport, product hints, image hints, and internal discovery links.
-- Request server-side context and recommendations instead of hardcoding campaign copy.
-- Render the banner/advisor inside Shadow DOM to reduce CSS collisions.
-- Track `page_view`, `banner_resolved`, `impression`, `click`, `close`, `dwell_30s`, `scroll`,
-  `cart_click`, `chat_open`, `chat_message`, and manual conversion-style events.
-- Prefer `navigator.sendBeacon` for tracking and fall back to `fetch`.
-- Never throw errors into the advertiser page.
+- Load the stable script once.
+- Create an anonymous SlipAI visitor/session ID.
+- Detect page type, product name, price, image, product number, and URL when possible.
+- Send same-domain discovery URLs so the backend crawler can build the catalog.
+- Render only the recommendation banner inside Shadow DOM.
+- Never expose OpenAI keys, Cafe24 tokens, or server secrets.
 
 ## Server Responsibilities
 
-- Authenticate widget traffic with project key, origin allowlist, and optional shared secret.
-- Validate all payloads with schemas before storing or invoking AI.
-- Keep OpenAI calls on the server.
-- Limit AI answers to the installed mall's products, reviews, options, and purchase decision support.
-- Block coding, general knowledge, other-brand, private customer data, and unsupported claims.
-- Resolve recommendations from crawled/synced product and review data.
-- Store events for operator visibility and future campaign reporting.
+- Validate widget auth, origin, and rate limits.
+- Store events and crawler discoveries.
+- Crawl same-domain product pages with bounded limits.
+- Extract product name, price, image, URL, review text, and rating.
+- Rank same-mall products by collected review count.
+- Return Korean banner copy explaining why the top product is recommended.
 
-## Current MVP Mapping
-
-SlipAI currently maps the generic "banner resolve API" concept to these endpoints:
+## Public Interfaces
 
 - `/onsite.js`: one-line compatibility loader for `data-site-id` installs.
-- `/api/widget/resolve`: compatibility config API returning `banner` and `chat` JSON.
-- `/api/chat`: compatibility AI advisor API that proxies to the scoped onsite chat engine.
-- `/api/events`: compatibility event API for generic banner/chat/conversion events.
-- `/api/onsite/context`: server-driven greeting, placeholder, and quick guidance copy.
-- `/api/onsite/recommendation`: server-driven banner content, review highlights, product cards, CTA, and disclosure.
-- `/api/onsite/chat`: server-driven AI advisor answer scoped to the installed mall.
-- `/api/onsite/events`: event tracking.
-- `/api/onsite/discovery` and `/api/onsite/crawl`: zero-action storefront catalog discovery.
+- `/widget/v1.js`: advanced SlipAI loader for `window.slipai("init", ...)` installs.
+- `/api/onsite/events`: event ingestion.
+- `/api/onsite/discovery`: discovered URL ingestion.
+- `/api/onsite/crawl`: bounded crawler worker trigger.
+- `/api/onsite/recommendation`: review-count based banner content.
+- `/api/widget/resolve`: compatibility banner resolver; chat is disabled.
+- `/api/events`: compatibility event ingestion.
 
-This means banner content is already server-driven. A future generic campaign manager can add
-campaign tables, priority rules, and a dedicated `/api/banner/resolve` compatibility layer without
-changing the installed storefront script.
+Legacy chat APIs may exist for backward compatibility, but the storefront widget must not render an AI 상담사 or call chat endpoints.
 
-## Future Campaign Layer
+## Stable Install Contract
 
-Add only after persistence, auth, and operator permissions are finalized:
-
-- `campaigns`: active state, priority, banner type, position, copy, image, CTA, trigger, dates.
-- `targeting_rules`: URL, device, UTM, audience, and product/category conditions.
-- `events`: impression, click, close, conversion, revenue, and metadata.
-- Admin CRUD for sites and campaigns.
-- Reporting for CTR, CVR, close rate, conversion revenue, and campaign fatigue.
-
-Until that layer exists, do not imply sales rank, bestseller status, discounts, coupons, inventory,
-membership, order history, or private customer identity unless supplied by a verified integration.
+- Brands keep the same `/onsite.js` or `/widget/v1.js` URL.
+- Future GitHub -> Vercel deployments update behavior through the stable script.
+- Production installs should not pin version query strings.
+- CSP allowlists may need the SlipAI domain for `script-src`, `connect-src`, and `img-src`.

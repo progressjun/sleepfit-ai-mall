@@ -6,7 +6,7 @@
   var widgetBrand = "SlipAI";
   if ((window.__C24AI && window.__C24AI.version) || (window.__SLIPAI && window.__SLIPAI.version)) return;
 
-  var VERSION = "0.3.5";
+  var VERSION = "0.4.0";
   var DEFAULT_SESSION_FREQUENCY_CAP = ${JSON.stringify(process.env.ONSITE_WIDGET_SESSION_FREQUENCY_CAP?.trim() || "3")};
   var DEFAULT_PROJECT_KEY = ${JSON.stringify(process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_PROJECT_KEY?.trim() || "pk_slipai_test")};
   var DEFAULT_MALL_ID = ${JSON.stringify(process.env.NEXT_PUBLIC_SLIPAI_DEFAULT_MALL_ID?.trim() || "slipai-test-kr")};
@@ -386,7 +386,7 @@
     } catch (_) {}
   }
   var css =
-    ".wrap{all:initial;position:relative;width:360px;max-width:100%;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;pointer-events:auto;color:#101010}.banner,.chat{box-sizing:border-box;border:1px solid rgba(13,13,13,.12);background:rgba(255,255,255,.98);box-shadow:0 18px 54px rgba(0,0,0,.16),0 1px 0 rgba(255,255,255,.8) inset;border-radius:14px;overflow:hidden}.banner{display:none;position:relative;margin-bottom:10px;transform-origin:bottom right}.banner.on{display:block;animation:c24aiSlideIn .36s cubic-bezier(.2,.8,.2,1)}.banner-close{appearance:none;position:absolute;right:10px;top:10px;border:0;background:#f4f4f4;color:#555;border-radius:8px;font-size:16px;line-height:1;width:28px;height:28px;cursor:pointer;z-index:2}.banner-body{padding:14px 44px 14px 14px}.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:#6b7280;font-weight:700}.eyebrow:before{content:'';display:inline-block;width:7px;height:7px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.14);animation:c24aiPulse 2.2s ease-in-out infinite}.msg{margin:10px 0 12px;font-size:14px;line-height:1.48;font-weight:650;word-break:keep-all;overflow-wrap:break-word}.review-wrap{display:none;margin-bottom:10px}.review-card{position:relative;background:#f7f7f8;border:1px solid #e5e5e5;border-radius:8px;padding:11px 12px 11px 42px;color:#1d2430}.review-card:before{content:'';position:absolute;left:14px;top:16px;width:12px;height:12px;border-radius:999px;background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 0 0 4px rgba(16,185,129,.12)}.review-copy{font-size:12px;line-height:1.5;font-weight:500;word-break:keep-all;overflow-wrap:break-word}.review-meta{margin-top:6px;font-size:10px;color:#6b7280}.review-dots{display:flex;gap:4px;margin-top:8px}.review-dot{width:5px;height:5px;border-radius:999px;background:#d7d7d7;transition:all .2s ease}.review-dot.on{width:18px;background:#101010}.product-strip{display:grid;gap:8px}.product-card{appearance:none;position:relative;width:100%;box-sizing:border-box;text-align:left;background:#fff;border:1px solid #ececf1;border-radius:8px;padding:10px 30px 10px 10px;display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;cursor:pointer;min-height:80px;overflow:hidden}.product-card:after{content:'';position:absolute;right:12px;top:50%;width:6px;height:6px;border-top:1.5px solid #8e8ea0;border-right:1.5px solid #8e8ea0;transform:translateY(-50%) rotate(45deg)}.product-card:hover{transform:translateY(-1px);border-color:#d9d9e3;box-shadow:0 8px 18px rgba(0,0,0,.07)}.product-media{display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,#f4f7fb,#edfdf7);border:1px solid #ececf1;color:#0d8f68;font-size:11px;font-weight:800}.product-media img{display:block;width:100%;height:100%;object-fit:cover}.product-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;letter-spacing:0}.product-copy{min-width:0;max-width:100%;overflow:hidden}.product-kicker{font-size:10px;color:#6b7280;font-weight:700}.product-name{margin-top:3px;font-size:12px;line-height:1.35;font-weight:760;word-break:keep-all;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.product-reason{margin-top:4px;font-size:11px;color:#5f6368;line-height:1.4;word-break:keep-all;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.product-price{margin-top:5px;font-size:11px;font-weight:760;color:#0d0d0d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.actions{display:flex;gap:8px;margin-top:12px}.btn{appearance:none;border:0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.2;font-weight:720;cursor:pointer}.btn:hover{transform:translateY(-1px)}.primary{background:#0d0d0d;color:#fff}.ghost{background:#f3f3f5;color:#171717;border:1px solid #e2e2e2}.tiny{margin-top:8px;font-size:11px;color:#8a8fa1}.chat{display:none;height:430px;max-height:70vh;transform-origin:bottom right}.chat.on{display:flex;flex-direction:column;animation:c24aiPanelIn .28s cubic-bezier(.2,.8,.2,1)}.head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #ececf1}.title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:760}.title:before{content:'';width:8px;height:8px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.16);animation:c24aiPulse 1.8s ease-in-out infinite}.close,.launcher{appearance:none;border:0;cursor:pointer}.close{background:#f4f4f4;color:#555;border-radius:8px;font-size:18px;line-height:1;width:30px;height:30px}.messages{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f7f7f8}.bubble{max-width:88%;border-radius:10px;padding:9px 10px;font-size:13px;line-height:1.42;animation:c24aiBubble .2s ease-out}.assistant{align-self:flex-start;background:#fff;border:1px solid #e5e5e5}.visitor{align-self:flex-end;background:#0d0d0d;color:#fff}.typing{display:flex;gap:4px;align-items:center}.typing i{display:block;width:6px;height:6px;border-radius:999px;background:#10b981;animation:c24aiDot 1s ease-in-out infinite}.typing i:nth-child(2){animation-delay:.14s}.typing i:nth-child(3){animation-delay:.28s}.form{display:flex;gap:8px;padding:10px;border-top:1px solid #ececf1}.input{min-width:0;flex:1;border:1px solid #d9d9e3;border-radius:8px;padding:10px;font-size:13px;outline:none}.input:focus{border-color:#a9a9b3;box-shadow:0 0 0 3px rgba(13,13,13,.06)}.launcher{position:relative;display:flex;align-items:center;justify-content:center;margin-left:auto;width:58px;height:58px;border-radius:999px;background:#0d0d0d;color:#fff;font-size:14px;font-weight:760;box-shadow:0 14px 38px rgba(0,0,0,.22);overflow:hidden;animation:c24aiFloat 3.4s ease-in-out infinite}.launcher:before{content:'';position:absolute;inset:8px;border-radius:999px;border:1px solid rgba(255,255,255,.22)}.launcher:after{content:'';position:absolute;inset:-1px;border-radius:999px;border:1px solid rgba(255,255,255,.18);animation:c24aiRing 2.8s ease-out infinite}.product-item{position:relative}.hidden{display:none} @keyframes c24aiSlideIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiPanelIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes c24aiPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.86)}}@keyframes c24aiRing{0%{opacity:.7;transform:scale(.84)}100%{opacity:0;transform:scale(1.18)}}@keyframes c24aiBubble{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}@keyframes c24aiDot{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}@media (max-width:480px){.banner-body{padding-right:42px}.launcher{width:56px;height:56px}.chat{height:68vh}.msg{font-size:13px}.product-price{font-size:10.5px}.product-reason{font-size:10px}}";
+    ".wrap{all:initial;position:relative;width:380px;max-width:100%;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;pointer-events:auto;color:#101010}.banner{box-sizing:border-box;border:1px solid rgba(13,13,13,.12);background:rgba(255,255,255,.98);box-shadow:0 18px 54px rgba(0,0,0,.16),0 1px 0 rgba(255,255,255,.8) inset;border-radius:14px;overflow:hidden;display:none;position:relative;margin-bottom:10px;transform-origin:bottom right}.banner.on{display:block;animation:c24aiSlideIn .36s cubic-bezier(.2,.8,.2,1)}.banner-close{appearance:none;position:absolute;right:10px;top:10px;border:0;background:#f4f4f4;color:#555;border-radius:8px;font-size:16px;line-height:1;width:28px;height:28px;cursor:pointer;z-index:2}.banner-body{padding:14px 44px 14px 14px}.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:#6b7280;font-weight:700}.eyebrow:before{content:'';display:inline-block;width:7px;height:7px;border-radius:999px;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.14);animation:c24aiPulse 2.2s ease-in-out infinite}.msg{margin:10px 0 12px;font-size:14px;line-height:1.48;font-weight:650;word-break:keep-all;overflow-wrap:break-word}.review-wrap{display:none;margin-bottom:10px}.review-card{position:relative;background:#f7f7f8;border:1px solid #e5e5e5;border-radius:8px;padding:11px 12px 11px 42px;color:#1d2430}.review-card:before{content:'';position:absolute;left:14px;top:16px;width:12px;height:12px;border-radius:999px;background:linear-gradient(135deg,#10b981,#34d399);box-shadow:0 0 0 4px rgba(16,185,129,.12)}.review-copy{font-size:12px;line-height:1.5;font-weight:500;word-break:keep-all;overflow-wrap:break-word}.review-meta{margin-top:6px;font-size:10px;color:#6b7280}.review-dots{display:flex;gap:4px;margin-top:8px}.review-dot{width:5px;height:5px;border-radius:999px;background:#d7d7d7;transition:all .2s ease}.review-dot.on{width:18px;background:#101010}.product-strip{display:grid;gap:8px}.product-card{appearance:none;position:relative;width:100%;box-sizing:border-box;text-align:left;background:#fff;border:1px solid #ececf1;border-radius:8px;padding:10px 30px 10px 10px;display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;cursor:pointer;min-height:80px;overflow:hidden}.product-card:after{content:'';position:absolute;right:12px;top:50%;width:6px;height:6px;border-top:1.5px solid #8e8ea0;border-right:1.5px solid #8e8ea0;transform:translateY(-50%) rotate(45deg)}.product-card:hover{transform:translateY(-1px);border-color:#d9d9e3;box-shadow:0 8px 18px rgba(0,0,0,.07)}.product-media{display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,#f4f7fb,#edfdf7);border:1px solid #ececf1;color:#0d8f68;font-size:11px;font-weight:800}.product-media img{display:block;width:100%;height:100%;object-fit:cover}.product-placeholder{display:flex;align-items:center;justify-content:center;width:100%;height:100%;letter-spacing:0}.product-copy{min-width:0;max-width:100%;overflow:hidden}.product-kicker{font-size:10px;color:#6b7280;font-weight:700}.product-name{margin-top:3px;font-size:12px;line-height:1.35;font-weight:760;word-break:keep-all;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.product-reason{margin-top:4px;font-size:11px;color:#5f6368;line-height:1.4;word-break:keep-all;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.product-price{margin-top:5px;font-size:11px;font-weight:760;color:#0d0d0d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.actions{display:flex;gap:8px;margin-top:12px}.btn{appearance:none;border:0;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.2;font-weight:720;cursor:pointer}.btn:hover{transform:translateY(-1px)}.primary{background:#0d0d0d;color:#fff}.ghost{background:#f3f3f5;color:#171717;border:1px solid #e2e2e2}.tiny{margin-top:8px;font-size:11px;color:#8a8fa1}.hidden{display:none}@keyframes c24aiSlideIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes c24aiPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.86)}}@media (max-width:480px){.wrap{width:100%}.banner-body{padding-right:42px}.msg{font-size:13px}.product-price{font-size:10.5px}.product-reason{font-size:10px}}";
 
   shadow.innerHTML =
     "<style>" +
@@ -398,14 +398,9 @@
     '<div class="msg"></div>' +
     '<div class="review-wrap"><div class="review-card"><div class="review-copy"></div><div class="review-meta"></div><div class="review-dots"></div></div></div>' +
     '<div class="product-strip"></div>' +
-    '<div class="actions"><button class="btn primary" type="button"></button><button class="btn ghost" type="button">내게 맞는 상품 찾기</button></div>' +
+    '<div class="actions"><button class="btn primary" type="button"></button><button class="btn ghost" type="button">추천 이유 보기</button></div>' +
     '<div class="tiny"></div>' +
     '</div></div>' +
-    '<div class="chat" part="chat"><div class="head"><div class="title">SlipAI 상담사</div><button class="close" type="button" aria-label="상담창 닫기">×</button></div>' +
-    '<div class="messages"></div>' +
-    '<form class="form"><input class="input" autocomplete="off" placeholder="이 쇼핑몰에서 어떤 점이 고민되나요?" /><button class="btn primary" type="submit">전송</button></form>' +
-    '</div>' +
-    '<button class="launcher" type="button" aria-label="SlipAI 상담사 열기">SlipAI</button>' +
     "</div>";
 
   var banner = shadow.querySelector(".banner");
@@ -419,12 +414,6 @@
   var primaryButton = shadow.querySelector(".banner .primary");
   var ghostButton = shadow.querySelector(".banner .ghost");
   var bannerCloseButton = shadow.querySelector(".banner-close");
-  var chat = shadow.querySelector(".chat");
-  var launcher = shadow.querySelector(".launcher");
-  var closeButton = shadow.querySelector(".chat .close");
-  var messages = shadow.querySelector(".messages");
-  var form = shadow.querySelector(".form");
-  var input = shadow.querySelector(".input");
   var disclaimer = shadow.querySelector(".tiny");
 
   var recommendationRequested = false;
@@ -433,7 +422,6 @@
   var dwellStartedAt = 0;
   var reviewTimer = 0;
   var reviewIndex = 0;
-  var conversationId = "";
   var currentRoute = "";
   var scrollTracked = false;
   var exitIntentRequested = false;
@@ -444,62 +432,9 @@
   var recommendationLastKey = "slipai_reco_last_" + projectKey + "_" + mallId;
   var homeGreetingSessionKey = "slipai_home_greeting_shown_" + projectKey + "_" + mallId;
   var homeGreetingTimer = 0;
-  var advisorContext = {
-    greeting: "이 쇼핑몰의 상품과 후기 기준으로 도와드릴게요.",
-    placeholder: "이 쇼핑몰에서 어떤 점이 고민되나요?",
-    secondaryCta: "내게 맞는 상품 찾기",
-  };
-
-  function applyAdvisorContext(data) {
-    if (!data || typeof data !== "object") return;
-    if (typeof data.greeting === "string" && data.greeting.trim()) {
-      advisorContext.greeting = data.greeting.trim();
-    }
-    if (typeof data.placeholder === "string" && data.placeholder.trim()) {
-      advisorContext.placeholder = data.placeholder.trim();
-      input.setAttribute("placeholder", advisorContext.placeholder);
-    }
-    if (typeof data.secondaryCta === "string" && data.secondaryCta.trim()) {
-      advisorContext.secondaryCta = data.secondaryCta.trim();
-      ghostButton.textContent = advisorContext.secondaryCta;
-    }
-  }
-
-  function requestAdvisorContext() {
-    postJson("/api/onsite/context", payloadBase())
-      .then(function (result) {
-        if (result && result.data) applyAdvisorContext(result.data);
-      })
-      .catch(function () {});
-  }
-
-  function addMessage(role, text) {
-    var bubble = document.createElement("div");
-    bubble.className = "bubble " + (role === "visitor" ? "visitor" : "assistant");
-    bubble.textContent = text;
-    messages.appendChild(bubble);
-    messages.scrollTop = messages.scrollHeight;
-    return bubble;
-  }
-
-  function addTypingIndicator() {
-    var bubble = document.createElement("div");
-    bubble.className = "bubble assistant typing";
-    bubble.setAttribute("aria-label", "SlipAI가 답변을 작성 중입니다");
-    bubble.innerHTML = "<i></i><i></i><i></i>";
-    messages.appendChild(bubble);
-    messages.scrollTop = messages.scrollHeight;
-    return bubble;
-  }
-
   function runCta(action) {
     track("banner_cta_click", { action: action });
     track("click", { surface: "banner", action: action });
-    if (action === "open_chat") {
-      openChat();
-      return;
-    }
-
     var selector =
       action === "add_to_cart"
         ? 'a[href*="basket"], button[name*="basket"], .btnBasket, #actionCart'
@@ -643,7 +578,7 @@
           if (nextUrl && nextUrl !== window.location.href) {
             window.location.href = nextUrl;
           } else {
-            openChat();
+            window.scrollTo({ top: 0, behavior: "smooth" });
           }
         };
       })();
@@ -726,15 +661,29 @@
   }
 
   function showBanner(data) {
+    var products = data.products || [];
+    var primaryProduct = products.length ? products[0] : null;
+    var primaryUrl = primaryProduct && primaryProduct.url ? primaryProduct.url : "";
     bannerMessage.textContent = data.message || "리뷰 반응이 좋은 상품과 함께 비교하기 좋은 상품을 보여드릴게요.";
     showReviewHighlights(data.reviewHighlights || []);
-    renderProducts(data.products || []);
+    renderProducts(products);
     disclaimer.textContent = data.disclosure || "";
     primaryButton.textContent = data.cta && data.cta.label ? data.cta.label : "상품 보러가기";
     primaryButton.onclick = function () {
+      if (primaryUrl && primaryUrl !== window.location.href) {
+        track("banner_cta_click", { action: "primary_product_click", url: primaryUrl });
+        track("click", { surface: "banner", action: "primary_product_click", url: primaryUrl });
+        window.location.href = primaryUrl;
+        return;
+      }
       runCta(data.cta && data.cta.action ? data.cta.action : "go_to_purchase");
     };
-    ghostButton.onclick = openChat;
+    ghostButton.onclick = function () {
+      track("click", { surface: "banner", action: "review_reason_focus" });
+      if (reviewWrap && !reviewWrap.classList.contains("hidden")) {
+        reviewWrap.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    };
     banner.classList.add("on");
     track("impression", { surface: "banner", ctaAction: data.cta && data.cta.action ? data.cta.action : "" });
     markRecommendationShown();
@@ -854,37 +803,14 @@
     }, dwellSeconds * 1000 + 500);
   }
 
-  function openChat() {
-    chat.classList.add("on");
-    launcher.classList.add("hidden");
-    if (!messages.childElementCount) {
-      addMessage("assistant", advisorContext.greeting);
-    }
-    track("chat_open");
-    window.setTimeout(function () {
-      input.focus();
-    }, 0);
+  function openRecommendationBanner() {
+    var product = detectProduct();
+    requestRecommendation(product.pageType === "product_detail" ? "manual" : (isFirstVisit ? "home_first_visit" : "home_returning_visit"));
   }
 
-  function closeChat() {
-    chat.classList.remove("on");
-    launcher.classList.remove("hidden");
-  }
-
-  function sendChat(text) {
-    addMessage("visitor", text);
-    var typing = addTypingIndicator();
-    track("chat_message", { length: text.length });
-    postJson("/api/onsite/chat", Object.assign(payloadBase(), { message: text, conversationId: conversationId || undefined }))
-      .then(function (result) {
-        if (result && result.conversationId) conversationId = result.conversationId;
-        if (typing && typing.parentNode) typing.parentNode.removeChild(typing);
-        addMessage("assistant", result && result.data && result.data.message ? result.data.message : "답변을 준비하고 있어요. 잠시 뒤 다시 질문해주세요.");
-      })
-      .catch(function () {
-        if (typing && typing.parentNode) typing.parentNode.removeChild(typing);
-        addMessage("assistant", "질문을 처리하는 중 잠시 문제가 생겼어요. 조금 뒤 다시 시도해주세요.");
-      });
+  function closeRecommendationBanner() {
+    track("close", { surface: "banner" });
+    clearBanner();
   }
 
   function bindSpaNavigation() {
@@ -899,7 +825,6 @@
         clearDwell();
         clearHomeGreeting();
         clearBanner();
-        requestAdvisorContext();
         track("page_view");
         sendDiscovery();
 
@@ -932,22 +857,9 @@
     onChange();
   }
 
-  launcher.addEventListener("click", openChat);
   bannerCloseButton.addEventListener("click", function () {
     track("close", { surface: "banner" });
     clearBanner();
-  });
-  closeButton.addEventListener("click", function () {
-    track("close", { surface: "chat" });
-    closeChat();
-  });
-  ghostButton.addEventListener("click", openChat);
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    var value = input.value.trim();
-    if (!value) return;
-    input.value = "";
-    sendChat(value);
   });
 
   document.addEventListener("visibilitychange", function () {
@@ -1009,7 +921,6 @@
   );
 
   function init() {
-    requestAdvisorContext();
     track("page_view");
     sendDiscovery(true);
     currentRoute = getRouteKey();
@@ -1030,8 +941,9 @@
       version: VERSION,
       config: { projectKey: projectKey, mallId: mallId, siteId: siteId || mallId },
       track: track,
-      openChat: openChat,
-      closeChat: closeChat,
+      open: openRecommendationBanner,
+      close: closeRecommendationBanner,
+      requestRecommendation: requestRecommendation,
       refreshProductContext: function () {
         clearBanner();
         clearHomeGreeting();
@@ -1068,11 +980,11 @@
         return window.__C24AI;
       },
       open: function () {
-        openChat();
+        openRecommendationBanner();
         return window.__C24AI;
       },
       close: function () {
-        closeChat();
+        closeRecommendationBanner();
         return window.__C24AI;
       },
       getState: function () {
@@ -1082,11 +994,11 @@
 
     window.slipai = function (command, payload) {
       if (command === "open" || command === "openChat") {
-        openChat();
+        openRecommendationBanner();
         return window.__C24AI;
       }
       if (command === "close" || command === "closeChat") {
-        closeChat();
+        closeRecommendationBanner();
         return window.__C24AI;
       }
       if (command === "refresh" || command === "refreshProductContext") {

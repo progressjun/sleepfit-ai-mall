@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
-import { onsiteRecommendationOutputSchema } from "@/lib/ai/schemas";
-import { generateStructuredOutput } from "@/lib/ai/service";
+import type { OnsiteRecommendationAIOutput } from "@/lib/ai/schemas";
+import type { OnsiteProductSource } from "@/lib/onsite/mock";
 import { corsHeaders, optionsResponse } from "@/lib/onsite/cors";
-import { createMockRecommendation } from "@/lib/onsite/mock";
-import { onsiteRecommendationPrompt } from "@/lib/onsite/prompts";
 import { applyOnsiteRateLimit, rateLimitHeaders } from "@/lib/onsite/rate-limit";
 import { onsiteRecommendationRequestSchema } from "@/lib/onsite/schemas";
 import {
-  getFeaturedOnsiteProducts,
-  getOnsiteKnowledge,
-  getRelatedOnsiteProducts,
+  getMostReviewedOnsiteProducts,
   recordRecommendationLog,
   validateOnsiteWidgetAuth,
 } from "@/lib/onsite/storage";
@@ -129,38 +125,79 @@ function sanitizeRecommendedProducts(
   allowed: ReturnType<typeof buildAllowedCatalog>,
   fallback: typeof products,
   currentProduct: { productNo?: string | number | null; name?: string | null },
+  excludeCurrentProduct = false,
 ) {
   const seen = new Set<string>();
 
   const candidates = [...products, ...fallback]
     .map((product) => enrichProduct(product, allowed))
     .filter((product) => isAllowedProduct(product, allowed))
-    .filter((product) => !sameProductIdentity(product, currentProduct))
+    .filter((product) => !excludeCurrentProduct || !sameProductIdentity(product, currentProduct))
     .filter((product) => {
       const key = productKey(product);
       if (!key || seen.has(key)) return false;
       seen.add(key);
       return true;
-    })
-    .sort((a, b) => {
-      const imageScore = Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl));
-      if (imageScore !== 0) return imageScore;
-      const urlScore = Number(Boolean(b.url)) - Number(Boolean(a.url));
-      if (urlScore !== 0) return urlScore;
-      return normalizeText(a.name).localeCompare(normalizeText(b.name), "ko");
     });
 
   return candidates.slice(0, 3);
 }
 
-function isHomeRecommendationTrigger(trigger: string) {
-  return trigger === "home_first_visit" || trigger === "home_returning_visit";
+function reviewCount(product: OnsiteProductSource) {
+  return product.reviews.filter((review) => review.content.trim()).length;
 }
 
-function homeGreeting(trigger: string) {
-  return trigger === "home_first_visit"
-    ? "첫 방문이시군요. 많이 살펴보는 상품부터 보여드릴게요."
-    : "다시 오셨네요. 어떤 부분이 고민되세요?";
+function reviewHighlights(product: OnsiteProductSource) {
+  const highlights = product.reviews
+    .filter((review) => review.rating >= 4 && review.content.trim())
+    .map((review) => review.content.trim())
+    .slice(0, 6);
+
+  return highlights.length > 0
+    ? highlights
+    : ["후기 데이터가 쌓이는 중이라 상품 정보와 이미지 기준으로 먼저 추천드려요."];
+}
+
+function recommendationReason(product: OnsiteProductSource, index: number) {
+  const count = reviewCount(product);
+  const summary = product.reviewSummary ? ` ${product.reviewSummary}` : "";
+  if (count > 0) {
+    return `${count}개의 리뷰가 모인 상품이라 실제 구매자가 반복해서 남긴 만족 포인트를 확인하기 좋아요.${summary}`;
+  }
+
+  return index === 0
+    ? "수집된 상품 정보와 이미지가 가장 안정적이라 먼저 보여드리는 추천 상품입니다."
+    : "함께 비교하면 구매 전 선택지를 좁히는 데 도움이 되는 상품입니다.";
+}
+
+function createMostReviewedRecommendation(products: OnsiteProductSource[], mallId: string): OnsiteRecommendationAIOutput {
+  const topProduct = products[0];
+  const topReviewCount = topProduct ? reviewCount(topProduct) : 0;
+  const message =
+    topProduct && topReviewCount > 0
+      ? `${topProduct.name}은(는) ${mallId}에서 후기가 가장 많이 모인 상품이에요. 리뷰에서 반복되는 만족 포인트가 있어 먼저 추천드려요.`
+      : topProduct
+        ? `${topProduct.name}을(를) 먼저 추천드려요. 아직 리뷰 수가 충분하지 않아 상품 정보와 이미지 기준으로 안내합니다.`
+        : "리뷰 반응이 좋은 상품을 찾고 있어요. 상품 데이터가 수집되면 가장 후기가 많은 상품부터 추천드릴게요.";
+
+  return {
+    surface: "banner",
+    message,
+    reviewHighlights: topProduct ? reviewHighlights(topProduct) : [],
+    products: products.slice(0, 3).map((product, index) => ({
+      productNo: product.productNo == null ? null : String(product.productNo),
+      name: product.name,
+      reason: recommendationReason(product, index),
+      priceText: product.priceText ?? null,
+      imageUrl: product.imageUrl ?? null,
+      url: product.url ?? null,
+    })),
+    cta: {
+      label: "추천 상품 보러가기",
+      action: "go_to_purchase",
+    },
+    disclosure: "SlipAI는 이 쇼핑몰에서 수집된 상품별 리뷰 수와 리뷰 내용을 기준으로 추천합니다.",
+  };
 }
 
 export async function POST(request: Request) {
@@ -201,89 +238,34 @@ export async function POST(request: Request) {
     );
   }
 
-  const isHomeTrigger = isHomeRecommendationTrigger(parsed.data.trigger);
-  const knowledge = await getOnsiteKnowledge({
+  const mostReviewedProducts = await getMostReviewedOnsiteProducts({
     projectKey: parsed.data.projectKey,
     mallId: parsed.data.mallId,
-    product: parsed.data.product,
+    limit: 3,
   });
-  const relatedProducts = isHomeTrigger
-    ? await getFeaturedOnsiteProducts({
-        projectKey: parsed.data.projectKey,
-        mallId: parsed.data.mallId,
-        limit: 3,
-      })
-    : await getRelatedOnsiteProducts({
-        projectKey: parsed.data.projectKey,
-        mallId: parsed.data.mallId,
-        currentProduct: knowledge,
-      });
-  const fallbackRecommendation = {
-    ...createMockRecommendation(knowledge, relatedProducts),
-    ...(isHomeTrigger
-      ? {
-          message: homeGreeting(parsed.data.trigger),
-          cta: {
-            label: "상품 추천 받기",
-            action: "open_chat" as const,
-          },
-          disclosure: "SlipAI가 이 쇼핑몰의 상품과 리뷰 정보를 바탕으로 추천합니다.",
-        }
-      : {}),
-  };
-  const allowedCatalog = buildAllowedCatalog(isHomeTrigger ? relatedProducts : [knowledge, ...relatedProducts]);
-
-  const result = await generateStructuredOutput({
-    taskName: "onsite_recommendation",
-    prompt: onsiteRecommendationPrompt,
-    input: {
-      request: parsed.data,
-      product: knowledge,
-      relatedProducts,
-      trigger: parsed.data.trigger,
-      reviewPolicy:
-        "Answer in Korean. Only use supplied product, related product candidates, and review evidence. For home_first_visit or home_returning_visit, act as a friendly shopping guide and recommend featured products from the same mall. Do not claim best-selling or sales rank unless explicit order/sales data is supplied. Use phrases like 많이 살펴보는 상품, 리뷰 반응이 좋은 상품, 함께 비교하기 좋은 상품. For dwell_30s, prioritize positive review highlights and then similar products. For cart_click, focus on comparison confidence. For exit_intent, lead with review proof and a low-pressure chat CTA. Do not invent discounts, inventory, medical claims, private customer data, or cross-brand products. Do not recommend the current product as an alternative to itself.",
-    },
-    schema: onsiteRecommendationOutputSchema,
-    mock: fallbackRecommendation,
-    model: process.env.ONSITE_OPENAI_MODEL?.trim() || undefined,
-    maxOutputTokens: Number(process.env.ONSITE_OPENAI_MAX_OUTPUT_TOKENS || "240"),
-    reasoningEffort: process.env.ONSITE_OPENAI_REASONING_EFFORT,
-  });
+  const allowedCatalog = buildAllowedCatalog(mostReviewedProducts);
+  const recommendation = createMostReviewedRecommendation(mostReviewedProducts, parsed.data.mallId);
 
   const sanitizedProducts = sanitizeRecommendedProducts(
-    result.data.products,
+    recommendation.products,
     allowedCatalog,
-    fallbackRecommendation.products,
-    knowledge,
+    [],
+    parsed.data.product,
+    false,
   );
 
-  const normalizedResult = {
-    ...result,
-    data: {
-      ...result.data,
-      reviewHighlights:
-        result.data.reviewHighlights.length > 0
-          ? result.data.reviewHighlights.slice(0, 6)
-          : fallbackRecommendation.reviewHighlights,
-      products: sanitizedProducts,
-      cta:
-        sanitizedProducts.length > 0
-          ? result.data.cta
-          : {
-              label: "후기 더보기 및 상담하기",
-              action: "open_chat" as const,
-            },
-    },
+  const normalizedData = {
+    ...recommendation,
+    products: sanitizedProducts,
   };
 
   await recordRecommendationLog(parsed.data, {
-    ...normalizedResult.data,
-    usage: normalizedResult.usage,
+    ...normalizedData,
+    source: "most_reviewed_catalog",
   });
 
   return NextResponse.json(
-    { data: normalizedResult.data, source: normalizedResult.source },
+    { data: normalizedData, source: "catalog" },
     { headers: { ...corsHeaders(request), ...rateLimitHeaders(rateLimit) } },
   );
 }

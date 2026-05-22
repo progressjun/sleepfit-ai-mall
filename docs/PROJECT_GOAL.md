@@ -1,28 +1,27 @@
-# 프로젝트 목표 (Maintenance Edition)
+# Project Goal
 
-## 핵심 목표
-SlipAI는 광고주가 Cafe24에 단일 스크립트만 삽입하면 사용할 수 있는
-온사이트 AI 추천/상담 MVP를 안정적으로 운영하는 것이 목표다.
+## Primary Goal
+SlipAI is a one-tag onsite recommendation banner for Cafe24 and other commerce storefronts.
+Advertisers install a stable script once, and SlipAI collects same-mall product/review context to show a Korean onsite banner recommending the product with the strongest review evidence.
 
-## 비즈니스 목적
-1. **상품 중심 추천 정확도 향상**
-   - 현재 상품 컨텍스트 + 유사 상품/리뷰 근거 기반 추천 제공
-2. **구매 전환 강화**
-   - 장바구니 전환 전 행동 기반 배너 노출(30초 체류 트리거)
-3. **비용 통제**
-   - 온사이트 응답은 경량 출력 설정 및 저렴 모델 운영
-4. **브랜드 범위 고정**
-   - 모델은 오직 설치된 상점/상품 데이터 기반으로만 응답
+## MVP Scope
+- One stable storefront script: `/onsite.js` or `/widget/v1.js`.
+- Anonymous page/event collection: `page_view`, `dwell_30s`, `scroll`, `cart_click`, banner `impression/click/close`.
+- Background discovery/crawling of same-domain product pages.
+- Review-count based product recommendation banner.
+- Product cards with image, product name, price when available, review-based reason, and click-through URL.
+- No visible AI 상담사/chat launcher on installed storefronts.
 
-## 제품 범위 (MVP 유지)
-- 카페24 공통 레이아웃 스크립트 1개 설치
-- 페이지 컨텍스트 수집 (`page_view`, `dwell`, `scroll`, `cart_click`)
-- 제품 상세 체류 기반 배너 추천
-- 상담창 채팅 기반 상품/리뷰 질문 대응
-- 외부 브랜드/코딩/일반 상식 질문은 정책적으로 거부
+## Product Rules
+- Recommend only products from the installed mall/catalog.
+- Prioritize products with the most collected reviews.
+- Explain why a product is recommended using review count, review highlights, and product data.
+- Do not claim sales rank, bestseller status, inventory, coupons, or private customer data unless that data is explicitly supplied.
+- Keep OpenAI/API keys server-side only; the script never exposes secrets.
 
-## 유지보수 우선순위 (변경 불가 영역 제외)
-- 안정성: 타입체크/빌드/린트 게이트 강화
-- 가시성: 위젯/로그/장애 대응 문서 정비
-- 비용: 토큰 사용량 모니터링 기준 문서화
-- 보안: 환경변수/토큰/인증 경로는 기능 동작만 보증
+## Maintenance Priority
+1. Keep the stable install script working.
+2. Prevent broken Korean/mojibake and old English widget copy.
+3. Keep product cards readable, clickable, and image-safe.
+4. Keep crawler/review extraction reliable.
+5. Add persistence/observability before real advertiser traffic.

@@ -25,7 +25,7 @@
    - Set `SLIPAI_HEALTH_BASE_URL` to the public app URL.
    - Set `SLIPAI_HEALTH_ORIGIN` to an allowed storefront origin.
    - Set `SLIPAI_HEALTH_WIDGET_TOKEN` only when the server requires a widget token.
-5. For a full recommendation/chat smoke check that can call OpenAI:
+5. For a full recommendation smoke check that can call costly endpoints:
    - Set `SLIPAI_HEALTH_FULL_AI=1`.
    - Use this sparingly because it may consume API tokens.
 
@@ -33,14 +33,14 @@
 - `/widget/v1.js` is reachable.
 - The widget exposes `window.__SLIPAI`.
 - The visible widget UI uses Korean copy:
-  - `SlipAI 상담사`
-  - `상품, 사이즈, 후기 중 어떤 부분이 고민되나요?`
-  - `전송`
+  - `SlipAI 추천`
+  - `추천 이유 보기`
+  - `상품 보러가기`
 - Old English UI strings are not present.
 - The event API accepts a `page_view` payload.
 - The ops API can read the installation summary.
-- The chat scope guard blocks coding/general questions with a Korean refusal.
-- Optional full AI mode validates recommendation/chat Korean responses and product cards.
+- The storefront widget does not render or call AI 상담사/chat.
+- Optional full mode validates recommendation Korean responses and product cards.
 
 ## Commit Policy
 - Stage only SlipAI maintenance files when unrelated local work exists.

@@ -108,12 +108,12 @@ are picked up quickly while still protecting the server from excessive script fe
 1. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/website`.
 2. Confirm the copied install snippet uses the Vercel URL, not `localhost` or a tunnel URL.
 3. Open `https://YOUR_SLIPAI_PROJECT.vercel.app/onsite.js`.
-4. Confirm the response contains `SlipAI 상담사`.
+4. Confirm the response contains `SlipAI 추천` and does not contain `SlipAI 상담사`.
 5. Install the snippet on a test storefront.
 6. In the browser console, confirm `window.__SLIPAI.getState()` exists.
 7. On a product page, wait 30 seconds and confirm the recommendation banner appears.
-8. Ask a product question and confirm the advisor answers only within the installed mall/product scope.
-9. Ask a coding/general question and confirm SlipAI refuses.
+8. Confirm no AI 상담사 launcher/chat panel appears.
+9. Confirm the banner recommends a same-mall product with a review-based reason and the product card click opens the product URL when available.
 
 ## Git Flow
 

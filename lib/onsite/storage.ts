@@ -653,6 +653,10 @@ function positiveReviewCount(product: OnsiteProductSource) {
   return product.reviews.filter((review) => review.rating >= 4 && review.content.trim()).length;
 }
 
+function totalReviewCount(product: OnsiteProductSource) {
+  return product.reviews.filter((review) => review.content.trim()).length;
+}
+
 function sortFeaturedProducts(products: OnsiteProductSource[]) {
   return [...products].sort((a, b) => {
     const imageScore = Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl));
@@ -660,6 +664,21 @@ function sortFeaturedProducts(products: OnsiteProductSource[]) {
 
     const reviewScore = positiveReviewCount(b) - positiveReviewCount(a);
     if (reviewScore !== 0) return reviewScore;
+
+    return a.name.localeCompare(b.name, "ko");
+  });
+}
+
+function sortMostReviewedProducts(products: OnsiteProductSource[]) {
+  return [...products].sort((a, b) => {
+    const reviewScore = totalReviewCount(b) - totalReviewCount(a);
+    if (reviewScore !== 0) return reviewScore;
+
+    const positiveScore = positiveReviewCount(b) - positiveReviewCount(a);
+    if (positiveScore !== 0) return positiveScore;
+
+    const imageScore = Number(Boolean(b.imageUrl)) - Number(Boolean(a.imageUrl));
+    if (imageScore !== 0) return imageScore;
 
     return a.name.localeCompare(b.name, "ko");
   });
@@ -871,6 +890,77 @@ export async function getFeaturedOnsiteProducts({
   );
 
   return featured.length > 0 ? featured : fallback;
+}
+
+export async function getMostReviewedOnsiteProducts({
+  projectKey,
+  mallId,
+  limit = 3,
+}: {
+  projectKey: string;
+  mallId: string;
+  limit?: number;
+}) {
+  const fallback = createMockRelatedProducts(
+    createFallbackProduct({
+      pageType: "home",
+      name: "리뷰 반응 좋은 상품",
+    }),
+    limit,
+  );
+  const supabase = createServerSupabaseClient();
+
+  if (!supabase) {
+    const products = memoryStore().products.get(keyFor(projectKey, mallId)) || [];
+    const reviewed = sortMostReviewedProducts(products.filter((product) => product.name.trim())).slice(0, limit);
+    return reviewed.length > 0 ? reviewed : fallback;
+  }
+
+  const installation = await ensureInstallation(projectKey, mallId);
+  if (!installation.projectId) return fallback;
+
+  const productsResult = await supabase
+    .from("products")
+    .select("external_product_id,name,price,source_payload")
+    .eq("project_id", installation.projectId)
+    .limit(Math.max(limit * 10, 40));
+  const productRows = (productsResult.data as Array<Record<string, unknown>> | null) || [];
+  const productIds = productRows
+    .map((row) => String(row.external_product_id || "").trim())
+    .filter(Boolean);
+
+  if (productIds.length === 0) return fallback;
+
+  const reviewsResult = await supabase
+    .from("product_reviews")
+    .select("external_product_id,rating,content,created_at")
+    .eq("project_id", installation.projectId)
+    .in("external_product_id", productIds)
+    .limit(2000);
+  const reviewRows = (reviewsResult.data as Array<Record<string, unknown>> | null) || [];
+  const reviewsByProduct = new Map<string, OnsiteReviewSource[]>();
+
+  for (const row of reviewRows) {
+    const productNo = String(row.external_product_id || "").trim();
+    if (!productNo) continue;
+    const reviews = reviewsByProduct.get(productNo) || [];
+    reviews.push(...normalizeReviewRows([row]));
+    reviewsByProduct.set(productNo, reviews);
+  }
+
+  const reviewed = sortMostReviewedProducts(
+    productRows
+      .map((row) => {
+        const productNo = String(row.external_product_id || "").trim();
+        return {
+          ...productSourceFromRow(row),
+          reviews: reviewsByProduct.get(productNo) || [],
+        };
+      })
+      .filter((product) => product.name.trim()),
+  ).slice(0, limit);
+
+  return reviewed.length > 0 ? reviewed : fallback;
 }
 
 export async function storeCafe24Token(input: Cafe24TokenInput) {

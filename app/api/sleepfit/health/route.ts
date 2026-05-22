@@ -16,7 +16,14 @@ export function GET(request: Request) {
       service: "sleepfit",
       version: SLEEPFIT_VERSION,
       catalogProducts: sleepfitCatalog.length,
-      endpoints: ["/sleepfit.js", "/api/sleepfit/health", "/api/sleepfit/recommend", "/api/sleepfit/events"],
+      endpoints: [
+        "/sleepfit.js",
+        "/api/sleepfit/health",
+        "/api/sleepfit/recommend",
+        "/api/sleepfit/events",
+        "/api/sleepfit/admin/metrics",
+        "/sleepfit-admin",
+      ],
     },
     {
       headers: sleepfitCorsHeaders(request),

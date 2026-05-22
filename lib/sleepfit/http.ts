@@ -18,6 +18,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
   "https://www.sleepnsleepmall.com",
   "https://sleepnsleepmall.co.kr",
   "https://www.sleepnsleepmall.co.kr",
+  "https://sleepnsleepmall.cafe24.com",
 ];
 const buckets = new Map<string, RateLimitState>();
 const MAX_BUCKETS = 20_000;

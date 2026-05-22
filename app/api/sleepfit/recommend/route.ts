@@ -41,6 +41,9 @@ export async function POST(request: Request) {
     answers: parsed.data.answers,
     product: parsed.data.product,
     currentProductNo: parsed.data.currentProductNo,
+    pageType: parsed.data.pageType || parsed.data.page.pageType,
+    cartProductNos: parsed.data.cart?.productNos,
+    abGroup: parsed.data.abGroup,
   });
 
   return NextResponse.json(recommendation, {

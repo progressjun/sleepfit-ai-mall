@@ -3,38 +3,81 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta property="og:title" content="[슬립앤슬립] 깊은잠베개" />
-    <meta property="og:image" content="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg" />
+    <meta property="og:title" content="슬립앤슬립 깊은잠베개" />
+    <meta
+      property="og:image"
+      content="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg"
+    />
     <meta property="product:price:amount" content="94900" />
-    <title>SleepFit AI 데모 | 깊은잠베개</title>
+    <title>SleepFit AI 데모 | 깊은잠베개 상품상세</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
+        color: #231a15;
+        background: #f7f4f1;
         font-family:
+          "Noto Sans KR",
           ui-sans-serif,
           -apple-system,
           BlinkMacSystemFont,
           "Segoe UI",
-          "Noto Sans KR",
           sans-serif;
-        color: #201610;
-        background: #f7f3ef;
+      }
+
+      .topline {
+        padding: 10px 16px;
+        color: #fff;
+        background: #211713;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      header {
+        border-bottom: 1px solid #e6ded6;
+        background: #fff;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 18px 20px;
+      }
+
+      .logo {
+        font-size: 20px;
+        font-weight: 900;
+      }
+
+      .menu {
+        display: flex;
+        gap: 24px;
+        color: #43362e;
+        font-size: 14px;
+        font-weight: 800;
       }
 
       main {
-        max-width: 1080px;
+        max-width: 1180px;
         margin: 0 auto;
-        padding: 44px 20px 160px;
+        padding: 34px 20px 150px;
       }
 
       .product {
         display: grid;
-        grid-template-columns: minmax(260px, 420px) minmax(0, 1fr);
-        gap: 34px;
+        grid-template-columns: minmax(280px, 470px) minmax(0, 1fr);
+        gap: 42px;
         align-items: start;
         padding: 28px;
         border: 1px solid #e4d9cf;
-        border-radius: 12px;
+        border-radius: 8px;
         background: #fff;
       }
 
@@ -42,7 +85,7 @@
         width: 100%;
         aspect-ratio: 1;
         border: 1px solid #eadfd5;
-        border-radius: 10px;
+        border-radius: 8px;
         object-fit: cover;
         background: #f1ebe5;
       }
@@ -57,26 +100,41 @@
       h1 {
         margin: 0 0 12px;
         font-size: 32px;
-        line-height: 1.2;
+        line-height: 1.25;
+        letter-spacing: 0;
       }
 
       .copy {
+        margin: 0;
         color: #66574c;
         line-height: 1.7;
       }
 
       .price {
         margin: 18px 0;
-        color: #5b3a27;
-        font-size: 24px;
+        color: #4f3527;
+        font-size: 25px;
         font-weight: 900;
       }
 
+      .review {
+        display: inline-flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        color: #5a4a41;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .infoArea {
+        min-width: 0;
+      }
+
       .productOption {
-        margin: 22px 0 16px;
+        margin: 18px 0 16px;
         padding: 18px;
         border: 1px solid #eadfd5;
-        border-radius: 10px;
+        border-radius: 8px;
         background: #fffaf6;
       }
 
@@ -121,62 +179,99 @@
         background: #eadfd5;
       }
 
+      .naverpay {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #d5e4d0;
+        border-radius: 8px;
+        color: #1f5c2d;
+        background: #f5fbf3;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
       .detail {
-        margin-top: 36px;
-        padding: 36px;
-        border-radius: 12px;
+        margin-top: 32px;
+        padding: 34px;
+        border-radius: 8px;
         background: #fff;
         line-height: 1.8;
       }
 
       @media (max-width: 760px) {
+        .menu {
+          display: none;
+        }
+
         .product {
           grid-template-columns: 1fr;
-          padding: 20px;
+          padding: 18px;
+          gap: 22px;
         }
 
         h1 {
           font-size: 25px;
         }
+
+        .actions {
+          flex-direction: column;
+        }
       }
     </style>
   </head>
   <body>
+    <div class="topline">깊은잠베개 리뷰 15,009개 기반 추천 테스트 화면</div>
+    <header>
+      <div class="nav">
+        <div class="logo">SLEEP&amp;SLEEP</div>
+        <nav class="menu" aria-label="주요 메뉴">
+          <span>BEST</span>
+          <span>베개</span>
+          <span>토퍼/매트리스</span>
+          <span>침구</span>
+          <span>이벤트</span>
+        </nav>
+      </div>
+    </header>
+
     <main>
       <section class="product xans-product-detail" data-product-no="330">
+        <input type="hidden" name="product_no" value="330" />
         <img
           class="product-image"
           src="https://cafe24img.poxo.com/sleepnsleepmall/web/product/medium/202503/c37b0ec9db0b472dd1915a4c7973d0e4.jpg"
-          alt="[슬립앤슬립] 깊은잠베개"
+          alt="슬립앤슬립 깊은잠베개"
         />
-        <div>
-          <p class="eyebrow">SleepFit AI 데모</p>
-          <h1>[슬립앤슬립] 깊은잠베개</h1>
+        <div class="infoArea">
+          <p class="eyebrow">PILLOW</p>
+          <h1>슬립앤슬립 깊은잠베개</h1>
           <p class="copy">
-            수면 자세와 체형에 맞춰 S/M 옵션을 선택해야 하는 대표 상품입니다. SleepFit AI는 자동 장바구니 담기 대신 추천
-            근거를 보여주고 옵션 영역으로 부드럽게 연결합니다.
+            수면 자세와 체형에 맞춰 S/M 옵션을 비교하는 대표 베개입니다. SleepFit AI는 이 상품이 내 습관에 맞는지
+            확인하고 옵션 영역으로 자연스럽게 연결되는지 테스트합니다.
           </p>
+          <div class="review">★★★★★ 리뷰 15,009개 · 평점 4.6</div>
           <div id="span_product_price_text" class="price">94,900원</div>
           <div id="optionG" class="productOption">
             <label for="product_option_id1">옵션 선택</label>
             <select id="product_option_id1">
               <option>- [필수] 옵션을 선택해 주세요 -</option>
-              <option>S사이즈</option>
-              <option>M사이즈 (+4,000원)</option>
+              <option>S 사이즈</option>
+              <option>M 사이즈 (+4,000원)</option>
             </select>
           </div>
           <div class="actions">
             <button id="actionBuy" type="button">바로 구매</button>
             <button id="actionCart" type="button">장바구니</button>
           </div>
+          <div class="naverpay">Naver Pay 영역 예시</div>
         </div>
       </section>
 
       <section class="detail">
         <h2>상품 상세 영역</h2>
         <p>
-          실제 카페24 상세 페이지에서는 긴 이미지 상세와 리뷰, Q&A가 이어집니다. 데모에서는 옵션 스크롤과 장바구니 클릭
-          이벤트 수집을 확인하기 위한 최소 구조만 둡니다.
+          실제 카페24 상세 페이지에서는 긴 이미지 상세, 리뷰, Q&amp;A가 이어집니다. 위젯 CTA가 옵션 영역으로 스크롤되고
+          구매 버튼과 네이버페이 영역을 가리지 않는지 확인하기 위한 데모입니다.
         </p>
       </section>
     </main>
